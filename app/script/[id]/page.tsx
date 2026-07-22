@@ -3,6 +3,7 @@ import { incrementViews, publicView } from "@/lib/store";
 import ScriptView from "@/components/ScriptView";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export default async function ScriptPage({ params }: { params: { id: string } }) {
   let record = null;

@@ -1,16 +1,24 @@
 import Link from "next/link";
 import { listScripts, publicView } from "@/lib/store";
+import { getSupabaseConfigError } from "@/lib/supabase";
 import BeachHero from "@/components/BeachHero";
 import ScriptCard from "@/components/ScriptCard";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export default async function HomePage() {
+  const configError = getSupabaseConfigError();
   let all: Awaited<ReturnType<typeof listScripts>> = [];
-  try {
-    all = await listScripts();
-  } catch {
-    all = [];
+  let loadError = configError;
+
+  if (!configError) {
+    try {
+      all = await listScripts();
+    } catch (e) {
+      loadError = e instanceof Error ? e.message : String(e);
+      all = [];
+    }
   }
 
   const scriptCount = all.length;
@@ -44,6 +52,19 @@ export default async function HomePage() {
       <BeachHero scriptCount={scriptCount} viewCount={viewCount} topGames={topGames} />
       <div className="latest-band">
         <main className="app">
+          {loadError ? (
+            <div className="panel" style={{ marginTop: 24, marginBottom: 8 }}>
+              <h3 style={{ marginBottom: 8 }}>Database connection issue</h3>
+              <p className="muted" style={{ marginBottom: 10 }}>
+                {loadError}
+              </p>
+              <p className="hint">
+                Check <code>/api/health</code> on this site, confirm env vars on Vercel, then
+                redeploy.
+              </p>
+            </div>
+          ) : null}
+
           {trending.length > 0 ? (
             <>
               <div className="section-head">
