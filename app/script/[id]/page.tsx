@@ -1,12 +1,31 @@
 import Link from "next/link";
-import { incrementViews, publicView } from "@/lib/store";
+import type { Metadata } from "next";
+import { getScript, incrementViews, publicView } from "@/lib/store";
 import { resolveRobloxGame } from "@/lib/roblox";
+import { buildScriptMetadata, scriptJsonLd } from "@/lib/seo";
 import ScriptView from "@/components/ScriptView";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export default async function ScriptPage({ params }: { params: { id: string } }) {
+type PageProps = { params: { id: string } };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  try {
+    const script = await getScript(params.id);
+    if (!script) {
+      return {
+        title: "Script not found",
+        robots: { index: false, follow: false },
+      };
+    }
+    return buildScriptMetadata(script);
+  } catch {
+    return { title: "Script" };
+  }
+}
+
+export default async function ScriptPage({ params }: PageProps) {
   let record = null;
   try {
     record = await incrementViews(params.id);
@@ -45,5 +64,18 @@ export default async function ScriptPage({ params }: { params: { id: string } })
     }
   }
 
-  return <ScriptView s={publicView(record, true)} game={game} />;
+  const jsonLd = scriptJsonLd(record, {
+    thumbnailUrl: game?.thumbnailUrl,
+    playUrl: game?.playUrl,
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ScriptView s={publicView(record, true)} game={game} />
+    </>
+  );
 }

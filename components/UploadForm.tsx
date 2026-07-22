@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { fmtBytes } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
+import TagInput from "@/components/TagInput";
 
 export default function UploadPage({ username }: { username: string }) {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function UploadPage({ username }: { username: string }) {
   const [drag, setDrag] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   const lines = code ? code.split("\n").length : 0;
   const size = new Blob([code]).size;
@@ -56,6 +58,7 @@ export default function UploadPage({ username }: { username: string }) {
     formRef.current?.reset();
     setCode("");
     setError("");
+    setFormKey((k) => k + 1);
   }
 
   return (
@@ -73,7 +76,7 @@ export default function UploadPage({ username }: { username: string }) {
           </div>
         </div>
 
-        <form ref={formRef} className="form-grid" onSubmit={onSubmit}>
+        <form key={formKey} ref={formRef} className="form-grid" onSubmit={onSubmit}>
           <div>
             <label>
               Title <span className="req">*</span>
@@ -98,10 +101,9 @@ export default function UploadPage({ username }: { username: string }) {
               We’ll pull the game name and thumbnail from this link for Play Game.
             </div>
           </div>
-          <div>
-            <label>Tags</label>
-            <input type="text" name="tags" placeholder="comma,separated,tags" />
-            <div className="hint">Author is set from your profile (@{username}).</div>
+          <TagInput name="tags" />
+          <div className="hint" style={{ marginTop: -8 }}>
+            Author is set from your profile (@{username}).
           </div>
           <div>
             <label>Description</label>
