@@ -5,12 +5,13 @@ import { listScripts, publicView } from "@/lib/store";
 import { withThumbnails } from "@/lib/thumbnails";
 import ScriptCard from "@/components/ScriptCard";
 import LogoutButton from "@/components/LogoutButton";
+import ProfileSettings from "@/components/ProfileSettings";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export const metadata = {
-  title: "My scripts — robloxscripts.free",
+  title: "My profile — robloxscripts.free",
 };
 
 export default async function ProfilePage() {
@@ -21,6 +22,7 @@ export default async function ProfilePage() {
     (await listScripts({ userId: profile.id, sort: "new" })).map((s) => publicView(s))
   );
   const views = mine.reduce((a, s) => a + (s.views || 0), 0);
+  const likes = mine.reduce((a, s) => a + (s.likes || 0), 0);
 
   return (
     <main className="app">
@@ -29,13 +31,24 @@ export default async function ProfilePage() {
       </Link>
 
       <div className="panel" style={{ marginBottom: 28 }}>
-        <div className="detail-head">
-          <div>
-            <span className="eyebrow">Your shore</span>
-            <h1>@{profile.username}</h1>
-            <p className="detail-sub">
-              {mine.length} script{mine.length === 1 ? "" : "s"} · {views} total views
-            </p>
+        <div className="detail-head profile-hero">
+          <div className="profile-hero-main">
+            <div className="profile-avatar-lg">
+              {profile.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profile.avatar_url} alt="" width={120} height={120} />
+              ) : (
+                <span aria-hidden>{(profile.username[0] || "?").toUpperCase()}</span>
+              )}
+            </div>
+            <div>
+              <span className="eyebrow">Your shore</span>
+              <h1>@{profile.username}</h1>
+              {profile.bio ? <p className="profile-bio">{profile.bio}</p> : null}
+              <p className="detail-sub">
+                {mine.length} script{mine.length === 1 ? "" : "s"} · {views} views · {likes} likes
+              </p>
+            </div>
           </div>
           <div className="detail-cta">
             <Link href="/upload" className="btn btn-primary">
@@ -45,6 +58,8 @@ export default async function ProfilePage() {
           </div>
         </div>
       </div>
+
+      <ProfileSettings profile={profile} />
 
       <div className="section-head" style={{ marginTop: 0 }}>
         <div>

@@ -1,18 +1,18 @@
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getAdminClient } from "@/lib/supabase/admin";
+import { normalizeUsername, type Profile } from "@/lib/profile";
 
-export type Profile = {
-  id: string;
-  username: string;
-  avatar_url: string | null;
-  created_at: string;
-};
+export type { Profile } from "@/lib/profile";
+export {
+  USERNAME_COOLDOWN_DAYS,
+  formatCooldown,
+  normalizeUsername,
+  usernameCooldownRemaining,
+  validateUsername,
+} from "@/lib/profile";
 
 function slugUsername(raw: string): string {
-  let base = raw
-    .toLowerCase()
-    .replace(/[^a-z0-9_]+/g, "_")
-    .replace(/^_+|_+$/g, "");
+  let base = normalizeUsername(raw);
   if (!base || base.length < 2) base = "user";
   return base.slice(0, 24);
 }
@@ -25,10 +25,16 @@ async function ensureProfile(
   const admin = getAdminClient();
   const { data: existing } = await admin
     .from("profiles")
-    .select("id, username, avatar_url, created_at")
+    .select("id, username, avatar_url, bio, created_at, username_changed_at")
     .eq("id", userId)
     .maybeSingle();
-  if (existing) return existing as Profile;
+  if (existing) {
+    return {
+      ...(existing as Profile),
+      bio: (existing as Profile).bio || "",
+      username_changed_at: (existing as Profile).username_changed_at || null,
+    };
+  }
 
   const preferred =
     (typeof meta?.full_name === "string" && meta.full_name) ||
@@ -50,12 +56,18 @@ async function ensureProfile(
           typeof meta?.avatar_url === "string" && meta.avatar_url
             ? meta.avatar_url
             : null,
+        bio: "",
       })
-      .select("id, username, avatar_url, created_at")
+      .select("id, username, avatar_url, bio, created_at, username_changed_at")
       .single();
 
-    if (!error && data) return data as Profile;
-    // Unique username conflict — try next suffix
+    if (!error && data) {
+      return {
+        ...(data as Profile),
+        bio: (data as Profile).bio || "",
+        username_changed_at: (data as Profile).username_changed_at || null,
+      };
+    }
     if (error?.code === "23505") {
       suffix += 1;
       continue;
@@ -81,13 +93,18 @@ export async function getCurrentProfile(): Promise<Profile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, avatar_url, created_at")
+    .select("id, username, avatar_url, bio, created_at, username_changed_at")
     .eq("id", user.id)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  if (data) return data as Profile;
+  if (data) {
+    return {
+      ...(data as Profile),
+      bio: (data as Profile).bio || "",
+      username_changed_at: (data as Profile).username_changed_at || null,
+    };
+  }
 
-  // Session exists but no profile row (trigger missing / race) — create one.
   return ensureProfile(user.id, user.user_metadata as Record<string, unknown> | undefined, user.email);
 }

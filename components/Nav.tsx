@@ -24,7 +24,17 @@ export default async function Nav() {
         <Link href="/executors">Executors</Link>
         {profile ? (
           <>
-            <Link href="/profile">@{profile.username}</Link>
+            <Link href="/profile" className="nav-profile">
+              <span className="nav-avatar">
+                {profile.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profile.avatar_url} alt="" width={28} height={28} />
+                ) : (
+                  <span aria-hidden>{(profile.username[0] || "?").toUpperCase()}</span>
+                )}
+              </span>
+              <span>@{profile.username}</span>
+            </Link>
             <Link href="/upload" className="btn btn-primary btn-sm">
               ＋ Upload
             </Link>
