@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import {
   listScripts,
-  createScript,
+  createScriptWithClient,
   publicView,
   sanitizeTags,
   MAX_CODE,
   type ScriptRecord,
 } from "@/lib/store";
-import { getSupabaseConfigError } from "@/lib/supabase";
+import { getSupabaseConfigError } from "@/lib/supabase/admin";
+import { createServerSupabase } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,16 +34,32 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/scripts  (JSON or multipart form-data)
+// POST /api/scripts — requires login
 export async function POST(req: NextRequest) {
   try {
     const configError = getSupabaseConfigError();
     if (configError) return fail(configError, 500);
 
+    const supabase = createServerSupabase();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return fail("You must be logged in to upload.", 401);
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const author =
+      (profile?.username as string | undefined)?.trim() ||
+      user.email?.split("@")[0] ||
+      "Anonymous";
+
     const contentType = req.headers.get("content-type") || "";
     let title = "";
     let description = "";
-    let author = "";
     let game = "";
     let tagsRaw: unknown = "";
     let code = "";
@@ -51,7 +68,6 @@ export async function POST(req: NextRequest) {
       const body = await req.json();
       title = (body.title || "").toString();
       description = (body.description || "").toString();
-      author = (body.author || "").toString();
       game = (body.game || "").toString();
       tagsRaw = body.tags;
       code = (body.code || "").toString();
@@ -59,7 +75,6 @@ export async function POST(req: NextRequest) {
       const form = await req.formData();
       title = (form.get("title") || "").toString();
       description = (form.get("description") || "").toString();
-      author = (form.get("author") || "").toString();
       game = (form.get("game") || "").toString();
       tagsRaw = form.get("tags");
       code = (form.get("code") || "").toString();
@@ -71,7 +86,6 @@ export async function POST(req: NextRequest) {
 
     title = title.trim();
     description = description.trim().slice(0, 2000);
-    author = author.trim().slice(0, 60) || "Anonymous";
     game = game.trim().slice(0, 80);
     const tags = sanitizeTags(tagsRaw);
 
@@ -83,15 +97,17 @@ export async function POST(req: NextRequest) {
       id: nanoid(10),
       title: title.slice(0, 120),
       description,
-      author,
+      author: author.slice(0, 60),
       game,
       tags,
       code,
       views: 0,
       copies: 0,
       createdAt: new Date().toISOString(),
+      userId: user.id,
     };
-    const saved = await createScript(record);
+
+    const saved = await createScriptWithClient(supabase, record);
     return NextResponse.json(publicView(saved, true), { status: 201 });
   } catch (e) {
     return fail(e);

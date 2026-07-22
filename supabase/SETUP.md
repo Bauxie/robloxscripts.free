@@ -1,0 +1,17 @@
+-- Auth setup checklist for robloxscripts.free
+--
+-- 1. Run schema.sql (scripts table)
+-- 2. Run auth.sql (profiles + user_id + RLS insert)
+-- 3. Supabase Dashboard → Authentication → URL Configuration
+--      Site URL: https://robloxscripts.free
+--      Redirect URLs include:
+--        http://localhost:3000/auth/callback
+--        https://robloxscripts.free/auth/callback
+-- 4. Providers: enable Email + Discord
+-- 5. Discord Developer Portal OAuth2 redirect:
+--      https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback
+-- 6. Env vars on Vercel + .env.local:
+--      SUPABASE_URL
+--      NEXT_PUBLIC_SUPABASE_URL
+--      NEXT_PUBLIC_SUPABASE_ANON_KEY
+--      SUPABASE_SERVICE_ROLE_KEY

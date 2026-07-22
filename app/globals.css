@@ -690,6 +690,22 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   padding: 6px 16px; box-shadow: var(--shadow-sm);
 }
 
+/* ---------- Auth ---------- */
+.auth-panel { max-width: 480px; }
+.auth-discord {
+  width: 100%; justify-content: center;
+  background: linear-gradient(180deg, #7289da, #5b6eae) !important;
+  color: #fff !important;
+  border-color: var(--line) !important;
+}
+.auth-discord:hover { filter: brightness(1.05); }
+.auth-switch { text-align: center; margin-top: 18px; font-weight: 700; }
+.auth-switch a {
+  color: var(--sea-deep); text-decoration: underline; text-underline-offset: 3px;
+}
+
+.nav-links .btn { flex-shrink: 0; }
+
 /* ---------- Executors ---------- */
 .exec-note {
   margin-bottom: 24px; font-weight: 700; line-height: 1.5; color: var(--ink-soft);

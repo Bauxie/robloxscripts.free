@@ -1,4 +1,5 @@
-import { getSupabase } from "@/lib/supabase";
+import { getAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type ScriptRecord = {
   id: string;
@@ -11,6 +12,7 @@ export type ScriptRecord = {
   views: number;
   copies: number;
   createdAt: string;
+  userId?: string | null;
 };
 
 export type ScriptView = Omit<ScriptRecord, "code"> & {
@@ -30,6 +32,7 @@ type ScriptRow = {
   views: number | null;
   copies: number | null;
   created_at: string;
+  user_id?: string | null;
 };
 
 export const MAX_CODE = 500_000; // ~500 KB
@@ -46,6 +49,7 @@ function fromRow(row: ScriptRow): ScriptRecord {
     views: row.views || 0,
     copies: row.copies || 0,
     createdAt: row.created_at,
+    userId: row.user_id ?? null,
   };
 }
 
@@ -61,6 +65,7 @@ function toRow(s: ScriptRecord) {
     views: s.views,
     copies: s.copies,
     created_at: s.createdAt,
+    user_id: s.userId ?? null,
   };
 }
 
@@ -75,6 +80,7 @@ export function publicView(s: ScriptRecord, includeCode = false): ScriptView {
     views: s.views,
     copies: s.copies,
     createdAt: s.createdAt,
+    userId: s.userId,
     lines: s.code ? s.code.split("\n").length : 0,
     size: s.code ? new TextEncoder().encode(s.code).length : 0,
   };
@@ -91,20 +97,16 @@ export function sanitizeTags(raw: unknown): string[] {
     .slice(0, 8);
 }
 
-export async function listScripts(opts?: {
-  q?: string;
-  sort?: string;
-}): Promise<ScriptRecord[]> {
-  const supabase = getSupabase();
-  const { data, error } = await supabase.from("scripts").select("*");
-  if (error) throw new Error(error.message);
-
-  let scripts = ((data || []) as ScriptRow[]).map(fromRow);
+function sortAndFilter(
+  scripts: ScriptRecord[],
+  opts?: { q?: string; sort?: string }
+): ScriptRecord[] {
+  let list = scripts;
   const q = (opts?.q || "").trim().toLowerCase();
   const sort = opts?.sort || "new";
 
   if (q) {
-    scripts = scripts.filter((s) => {
+    list = list.filter((s) => {
       const hay = [s.title, s.description, s.author, s.game, (s.tags || []).join(" ")]
         .join(" ")
         .toLowerCase();
@@ -112,33 +114,51 @@ export async function listScripts(opts?: {
     });
   }
 
-  if (sort === "popular") scripts.sort((a, b) => (b.views || 0) - (a.views || 0));
-  else if (sort === "copies") scripts.sort((a, b) => (b.copies || 0) - (a.copies || 0));
-  else scripts.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  if (sort === "popular") list.sort((a, b) => (b.views || 0) - (a.views || 0));
+  else if (sort === "copies") list.sort((a, b) => (b.copies || 0) - (a.copies || 0));
+  else list.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
-  return scripts;
+  return list;
+}
+
+export async function listScripts(opts?: {
+  q?: string;
+  sort?: string;
+  userId?: string;
+}): Promise<ScriptRecord[]> {
+  const supabase = getAdminClient();
+  let query = supabase.from("scripts").select("*");
+  if (opts?.userId) query = query.eq("user_id", opts.userId);
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+
+  return sortAndFilter(((data || []) as ScriptRow[]).map(fromRow), opts);
 }
 
 export async function getScript(id: string): Promise<ScriptRecord | null> {
-  const supabase = getSupabase();
+  const supabase = getAdminClient();
   const { data, error } = await supabase.from("scripts").select("*").eq("id", id).maybeSingle();
   if (error) throw new Error(error.message);
   return data ? fromRow(data as ScriptRow) : null;
 }
 
-export async function createScript(record: ScriptRecord): Promise<ScriptRecord> {
-  const supabase = getSupabase();
-  const { data, error } = await supabase
-    .from("scripts")
-    .insert(toRow(record))
-    .select("*")
-    .single();
+/** Insert with the caller's session client so RLS can enforce user_id = auth.uid() */
+export async function createScriptWithClient(
+  client: SupabaseClient,
+  record: ScriptRecord
+): Promise<ScriptRecord> {
+  const { data, error } = await client.from("scripts").insert(toRow(record)).select("*").single();
   if (error) throw new Error(error.message);
   return fromRow(data as ScriptRow);
 }
 
+export async function createScript(record: ScriptRecord): Promise<ScriptRecord> {
+  return createScriptWithClient(getAdminClient(), record);
+}
+
 export async function incrementViews(id: string): Promise<ScriptRecord | null> {
-  const supabase = getSupabase();
+  const supabase = getAdminClient();
   const current = await getScript(id);
   if (!current) return null;
 
@@ -153,7 +173,7 @@ export async function incrementViews(id: string): Promise<ScriptRecord | null> {
 }
 
 export async function incrementCopies(id: string): Promise<number | null> {
-  const supabase = getSupabase();
+  const supabase = getAdminClient();
   const current = await getScript(id);
   if (!current) return null;
 
@@ -163,7 +183,6 @@ export async function incrementCopies(id: string): Promise<number | null> {
   return next;
 }
 
-/** @deprecated use listScripts — kept name for gradual migration */
 export async function readScripts(): Promise<ScriptRecord[]> {
   return listScripts();
 }
