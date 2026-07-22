@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { readScripts, writeScripts, publicView } from "@/lib/store";
+import { incrementViews, publicView } from "@/lib/store";
 import ScriptView from "@/components/ScriptView";
 
 export const dynamic = "force-dynamic";
 
-export default function ScriptPage({ params }: { params: { id: string } }) {
-  const scripts = readScripts();
-  const record = scripts.find((x) => x.id === params.id);
+export default async function ScriptPage({ params }: { params: { id: string } }) {
+  let record = null;
+  try {
+    record = await incrementViews(params.id);
+  } catch {
+    record = null;
+  }
 
   if (!record) {
     return (
@@ -22,10 +26,6 @@ export default function ScriptPage({ params }: { params: { id: string } }) {
       </main>
     );
   }
-
-  // increment view count
-  record.views = (record.views || 0) + 1;
-  writeScripts(scripts);
 
   return <ScriptView s={publicView(record, true)} />;
 }

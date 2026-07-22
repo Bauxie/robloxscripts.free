@@ -1,12 +1,18 @@
 import Link from "next/link";
-import { readScripts, publicView } from "@/lib/store";
+import { listScripts, publicView } from "@/lib/store";
 import BeachHero from "@/components/BeachHero";
 import ScriptCard from "@/components/ScriptCard";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  const all = readScripts();
+export default async function HomePage() {
+  let all: Awaited<ReturnType<typeof listScripts>> = [];
+  try {
+    all = await listScripts();
+  } catch {
+    all = [];
+  }
+
   const scriptCount = all.length;
   const viewCount = all.reduce((a, s) => a + (s.views || 0), 0);
 
@@ -15,7 +21,6 @@ export default function HomePage() {
     .slice(0, 6)
     .map((s) => publicView(s));
 
-  // Trending: weighted by views + copies (ScriptBlox / RoScripts style)
   const trending = [...all]
     .map((s) => ({ s, score: (s.views || 0) + (s.copies || 0) * 3 }))
     .filter((x) => x.score > 0)
@@ -23,7 +28,6 @@ export default function HomePage() {
     .slice(0, 6)
     .map((x) => publicView(x.s));
 
-  // Popular games for quick-jump chips
   const gameCounts = new Map<string, number>();
   for (const s of all) {
     const g = (s.game || "").trim();

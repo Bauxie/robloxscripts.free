@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import {
-  readScripts,
-  writeScripts,
+  listScripts,
+  createScript,
   publicView,
   sanitizeTags,
   MAX_CODE,
@@ -13,25 +13,15 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // GET /api/scripts?q=&sort=
-export function GET(req: NextRequest) {
-  const q = (req.nextUrl.searchParams.get("q") || "").trim().toLowerCase();
-  const sort = req.nextUrl.searchParams.get("sort") || "new";
-  let scripts = readScripts();
-
-  if (q) {
-    scripts = scripts.filter((s) => {
-      const hay = [s.title, s.description, s.author, s.game, (s.tags || []).join(" ")]
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(q);
-    });
+export async function GET(req: NextRequest) {
+  try {
+    const q = (req.nextUrl.searchParams.get("q") || "").trim().toLowerCase();
+    const sort = req.nextUrl.searchParams.get("sort") || "new";
+    const scripts = await listScripts({ q, sort });
+    return NextResponse.json(scripts.map((s) => publicView(s)));
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
-
-  if (sort === "popular") scripts.sort((a, b) => (b.views || 0) - (a.views || 0));
-  else if (sort === "copies") scripts.sort((a, b) => (b.copies || 0) - (a.copies || 0));
-  else scripts.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-
-  return NextResponse.json(scripts.map((s) => publicView(s)));
 }
 
 // POST /api/scripts  (JSON or multipart form-data)
@@ -82,21 +72,22 @@ export async function POST(req: NextRequest) {
   if (code.length > MAX_CODE)
     return NextResponse.json({ error: "Script is too large (max 500 KB)." }, { status: 400 });
 
-  const scripts = readScripts();
-  const record: ScriptRecord = {
-    id: nanoid(10),
-    title: title.slice(0, 120),
-    description,
-    author,
-    game,
-    tags,
-    code,
-    views: 0,
-    copies: 0,
-    createdAt: new Date().toISOString(),
-  };
-  scripts.push(record);
-  writeScripts(scripts);
-
-  return NextResponse.json(publicView(record, true), { status: 201 });
+  try {
+    const record: ScriptRecord = {
+      id: nanoid(10),
+      title: title.slice(0, 120),
+      description,
+      author,
+      game,
+      tags,
+      code,
+      views: 0,
+      copies: 0,
+      createdAt: new Date().toISOString(),
+    };
+    const saved = await createScript(record);
+    return NextResponse.json(publicView(saved, true), { status: 201 });
+  } catch (e) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
 }
