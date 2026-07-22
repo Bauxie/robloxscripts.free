@@ -35,59 +35,55 @@ export default function RoleIcon({
       );
 
     case "admin":
-      // Shield with star
+      // Red shield
       return (
         <svg {...common}>
           <path
-            d="M12 2.8 19.2 5.6v5.3c0 4.5-3 8.3-7.2 9.7C7.8 19.2 4.8 15.4 4.8 10.9V5.6L12 2.8Z"
+            d="M12 2.5 19.5 5.5v5.6c0 4.8-3.2 8.8-7.5 10.3C7.7 19.9 4.5 15.9 4.5 11.1V5.5L12 2.5Z"
             fill="currentColor"
-            fillOpacity="0.22"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="1.2"
             strokeLinejoin="round"
           />
           <path
-            d="m12 8.2 1.05 2.2 2.4.28-1.8 1.6.52 2.35L12 13.5l-2.17 1.13.52-2.35-1.8-1.6 2.4-.28L12 8.2Z"
-            fill="currentColor"
-          />
-        </svg>
-      );
-
-    case "moderator":
-      // Gavel / moderation hammer
-      return (
-        <svg {...common}>
-          <path
-            d="M14.2 4.2 19.8 9.8l-2.1 2.1-5.6-5.6 2.1-2.1Z"
-            fill="currentColor"
-          />
-          <path
-            d="m8.6 9.8 5.6 5.6-2.1 2.1-5.6-5.6 2.1-2.1Z"
-            fill="currentColor"
-            fillOpacity="0.85"
-          />
-          <path
-            d="M6.2 16.8 4.4 18.6c-.7.7-.7 1.8 0 2.5.7.7 1.8.7 2.5 0l1.8-1.8-2.5-2.5Z"
-            fill="currentColor"
-          />
-          <path
-            d="M10.4 7.8c1.2-1.2 3.1-1.2 4.3 0l1.5 1.5c1.2 1.2 1.2 3.1 0 4.3"
-            stroke="currentColor"
-            strokeWidth="1.6"
+            d="M12 7.2v8.2M9.2 10.8h5.6"
+            stroke="#fff"
+            strokeWidth="1.8"
             strokeLinecap="round"
           />
         </svg>
       );
 
-    case "content_creator":
-      // YouTube-style play badge
+    case "moderator":
+      // Blue shield
       return (
         <svg {...common}>
           <path
-            d="M21.6 7.4c-.2-1-1-1.8-2-2C17.8 5 12 5 12 5s-5.8 0-7.6.4c-1 .2-1.8 1-2 2C2 9.2 2 12 2 12s0 2.8.4 4.6c.2 1 1 1.8 2 2C6.2 19 12 19 12 19s5.8 0 7.6-.4c1-.2 1.8-1 2-2 .4-1.8.4-4.6.4-4.6s0-2.8-.4-4.6Z"
+            d="M12 2.5 19.5 5.5v5.6c0 4.8-3.2 8.8-7.5 10.3C7.7 19.9 4.5 15.9 4.5 11.1V5.5L12 2.5Z"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9.2 12.2 11.2 14.2 15.2 9.8"
+            stroke="#fff"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case "content_creator":
+      // White YouTube logo on red circle background
+      return (
+        <svg {...common}>
+          <path
+            d="M21.2 8.1c-.2-.8-.8-1.4-1.6-1.5C18 6.3 12 6.3 12 6.3s-6 0-7.6.3c-.8.1-1.4.7-1.6 1.5C2.5 9.6 2.5 12 2.5 12s0 2.4.3 3.9c.2.8.8 1.4 1.6 1.5 1.6.3 7.6.3 7.6.3s6 0 7.6-.3c.8-.1 1.4-.7 1.6-1.5.3-1.5.3-3.9.3-3.9s0-2.4-.3-3.9Z"
             fill="currentColor"
           />
-          <path d="M10 8.8v6.4L15.6 12 10 8.8Z" fill="#fff" />
+          <path d="M10.2 9.3v5.4L14.9 12l-4.7-2.7Z" fill="#ff0033" />
         </svg>
       );
 
