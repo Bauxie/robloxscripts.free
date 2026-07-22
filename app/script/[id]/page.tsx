@@ -4,6 +4,7 @@ import { getScript, incrementViews, publicView } from "@/lib/store";
 import { resolveRobloxGame } from "@/lib/roblox";
 import { withAuthorAvatars } from "@/lib/thumbnails";
 import { buildScriptMetadata, scriptJsonLd } from "@/lib/seo";
+import { getCurrentProfile } from "@/lib/auth";
 import ScriptView from "@/components/ScriptView";
 
 export const dynamic = "force-dynamic";
@@ -71,6 +72,10 @@ export default async function ScriptPage({ params }: PageProps) {
   });
 
   const [view] = await withAuthorAvatars([publicView(record, true)]);
+  const me = await getCurrentProfile().catch(() => null);
+  const canEdit = Boolean(me && record.userId && me.id === record.userId);
+  const canComment = Boolean(me);
+  const canReport = Boolean(me && (!record.userId || me.id !== record.userId));
 
   return (
     <>
@@ -78,7 +83,13 @@ export default async function ScriptPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ScriptView s={view} game={game} />
+      <ScriptView
+        s={view}
+        game={game}
+        canEdit={canEdit}
+        canComment={canComment}
+        canReport={canReport}
+      />
     </>
   );
 }

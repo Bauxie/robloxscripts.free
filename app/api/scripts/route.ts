@@ -5,6 +5,7 @@ import {
   createScriptWithClient,
   publicView,
   sanitizeTags,
+  sanitizeExecutors,
   MAX_CODE,
   type ScriptRecord,
 } from "@/lib/store";
@@ -29,7 +30,11 @@ export async function GET(req: NextRequest) {
 
     const q = (req.nextUrl.searchParams.get("q") || "").trim().toLowerCase();
     const sort = req.nextUrl.searchParams.get("sort") || "new";
-    const scripts = await listScripts({ q, sort });
+    const game = req.nextUrl.searchParams.get("game") || "";
+    const tag = req.nextUrl.searchParams.get("tag") || "";
+    const executor = req.nextUrl.searchParams.get("executor") || "";
+    const verified = req.nextUrl.searchParams.get("verified") === "1";
+    const scripts = await listScripts({ q, sort, game, tag, executor, verified });
     const views = await enrichScriptViews(scripts.map((s) => publicView(s)));
     return NextResponse.json(views);
   } catch (e) {
@@ -65,6 +70,7 @@ export async function POST(req: NextRequest) {
     let description = "";
     let gameLink = "";
     let tagsRaw: unknown = "";
+    let executorsRaw: unknown = "";
     let code = "";
 
     if (contentType.includes("application/json")) {
@@ -73,6 +79,7 @@ export async function POST(req: NextRequest) {
       description = (body.description || "").toString();
       gameLink = (body.gameLink || body.game_url || body.gamePlaceId || "").toString();
       tagsRaw = body.tags;
+      executorsRaw = body.executors;
       code = (body.code || "").toString();
     } else {
       const form = await req.formData();
@@ -80,6 +87,7 @@ export async function POST(req: NextRequest) {
       description = (form.get("description") || "").toString();
       gameLink = (form.get("gameLink") || form.get("game_url") || "").toString();
       tagsRaw = form.get("tags");
+      executorsRaw = form.getAll("executors");
       code = (form.get("code") || "").toString();
       const file = form.get("file");
       if (file && typeof file !== "string") {
@@ -102,6 +110,7 @@ export async function POST(req: NextRequest) {
     }
 
     const tags = sanitizeTags(tagsRaw, game);
+    const executors = sanitizeExecutors(executorsRaw);
 
     if (!title) return fail("A title is required.", 400);
     if (!code.trim()) return fail("Script code is required.", 400);
@@ -115,6 +124,7 @@ export async function POST(req: NextRequest) {
       game,
       gamePlaceId,
       tags,
+      executors,
       code,
       views: 0,
       copies: 0,

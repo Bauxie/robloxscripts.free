@@ -6,6 +6,9 @@ import type { ScriptView as ScriptViewType } from "@/lib/store";
 import { timeAgo, fmtBytes, highlightLua } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
 import RoleBadges from "@/components/RoleBadges";
+import CommentsSection from "@/components/CommentsSection";
+import ReportButton from "@/components/ReportButton";
+import { EXECUTORS } from "@/lib/executors";
 
 type GamePreview = {
   placeId: string;
@@ -21,9 +24,15 @@ function likeKey(id: string) {
 export default function ScriptView({
   s,
   game,
+  canEdit = false,
+  canComment = false,
+  canReport = false,
 }: {
   s: ScriptViewType;
   game?: GamePreview | null;
+  canEdit?: boolean;
+  canComment?: boolean;
+  canReport?: boolean;
 }) {
   const toast = useToast();
   const html = useMemo(() => highlightLua(s.code || ""), [s.code]);
@@ -78,7 +87,23 @@ export default function ScriptView({
     }
   }
 
+  async function remove() {
+    if (!confirm("Delete this script?")) return;
+    try {
+      const res = await fetch(`/api/scripts/${s.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Delete failed");
+      toast("Script deleted");
+      window.location.href = "/profile";
+    } catch (e) {
+      toast((e as Error).message, true);
+    }
+  }
+
   const gameLabel = game?.name || s.game || "Roblox game";
+  const executorLabels = (s.executors || [])
+    .map((id) => EXECUTORS.find((e) => e.id === id))
+    .filter(Boolean);
 
   return (
     <main className="app">
@@ -98,25 +123,39 @@ export default function ScriptView({
                   <span aria-hidden>{(s.author[0] || "?").toUpperCase()}</span>
                 )}
               </span>
-              by <b>@{s.author}</b>
+              by{" "}
+              <Link href={`/u/${encodeURIComponent(s.author)}`}>
+                <b>@{s.author}</b>
+              </Link>
               <RoleBadges roles={s.authorRoles} size="sm" />
               <span>· {timeAgo(s.createdAt)}</span>
               {s.game ? (
                 <>
                   {" · "}
-                  <Link href={`/scripts?q=${encodeURIComponent(s.game)}`}>🎮 {s.game}</Link>
+                  <Link href={`/scripts?q=${encodeURIComponent(s.game)}&game=${encodeURIComponent(s.game)}`}>
+                    🎮 {s.game}
+                  </Link>
                 </>
               ) : null}
             </div>
             {s.tags?.length ? (
               <div className="tags">
                 {s.tags.map((t) => (
+                  <Link key={t} href={`/scripts?tag=${encodeURIComponent(t)}`} className="tag tag-link">
+                    #{t}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+            {executorLabels.length ? (
+              <div className="tags" style={{ marginTop: 8 }}>
+                {executorLabels.map((ex) => (
                   <Link
-                    key={t}
-                    href={`/scripts?q=${encodeURIComponent(t)}`}
+                    key={ex!.id}
+                    href={`/scripts?executor=${encodeURIComponent(ex!.id)}`}
                     className="tag tag-link"
                   >
-                    #{t}
+                    {ex!.emoji} {ex!.name}
                   </Link>
                 ))}
               </div>
@@ -137,6 +176,19 @@ export default function ScriptView({
             <a className="btn btn-ghost" href={`/api/scripts/${s.id}/raw`}>
               ⬇ Download .lua
             </a>
+            {canEdit ? (
+              <>
+                <Link href={`/script/${s.id}/edit`} className="btn btn-ghost">
+                  Edit
+                </Link>
+                <button type="button" className="btn btn-ghost" onClick={remove}>
+                  Delete
+                </button>
+              </>
+            ) : null}
+            {canReport ? (
+              <ReportButton targetType="script" targetId={s.id} label="Report" />
+            ) : null}
           </div>
         </div>
 
@@ -213,6 +265,8 @@ export default function ScriptView({
             <code dangerouslySetInnerHTML={{ __html: html }} />
           </pre>
         </div>
+
+        <CommentsSection scriptId={s.id} canComment={canComment} />
       </div>
     </main>
   );

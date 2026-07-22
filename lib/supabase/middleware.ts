@@ -37,7 +37,11 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const needsAuth =
-    path.startsWith("/upload") || path.startsWith("/profile") || path.startsWith("/admin");
+    path.startsWith("/upload") ||
+    path.startsWith("/profile") ||
+    path.startsWith("/admin") ||
+    path.startsWith("/notifications") ||
+    /^\/script\/[^/]+\/edit\/?$/.test(path);
 
   if (needsAuth && !user) {
     const login = request.nextUrl.clone();

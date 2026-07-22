@@ -87,6 +87,14 @@ export function canManageRoles(roles: RoleId[]): boolean {
   return roles.includes("owner") || roles.includes("admin");
 }
 
+export function canModerate(roles: RoleId[]): boolean {
+  return (
+    roles.includes("owner") ||
+    roles.includes("admin") ||
+    roles.includes("moderator")
+  );
+}
+
 /** Admins cannot grant/revoke owner unless they are owner. */
 export function canAssignRole(actorRoles: RoleId[], targetRole: RoleId): boolean {
   if (!canManageRoles(actorRoles)) return false;

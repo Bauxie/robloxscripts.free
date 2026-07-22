@@ -1,24 +1,33 @@
+"use client";
+
 import Link from "next/link";
 import type { ScriptView } from "@/lib/store";
 import { timeAgo } from "@/lib/format";
 import RoleBadges from "@/components/RoleBadges";
+import { EXECUTORS } from "@/lib/executors";
+import ScriptManageButtons from "@/components/ScriptManageButtons";
 
 export default function ScriptCard({
   s,
   hot = false,
   showTags = false,
+  manage = false,
 }: {
   s: ScriptView;
   hot?: boolean;
   showTags?: boolean;
+  manage?: boolean;
 }) {
+  const executors = (s.executors || [])
+    .map((id) => EXECUTORS.find((e) => e.id === id))
+    .filter(Boolean)
+    .slice(0, 3);
+
   return (
-    <Link
-      href={`/script/${s.id}`}
+    <article
       className={`card${hot ? " card-hot" : ""}${s.thumbnailUrl ? " card-has-media" : ""}`}
-      style={{ color: "inherit" }}
     >
-      <div className="card-media">
+      <Link href={`/script/${s.id}`} className="card-media" style={{ color: "inherit" }}>
         {s.thumbnailUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={s.thumbnailUrl} alt="" width={512} height={512} />
@@ -32,11 +41,13 @@ export default function ScriptCard({
             🎮 {s.game}
           </div>
         ) : null}
-      </div>
+      </Link>
 
       <div className="card-body">
-        <h3>{s.title}</h3>
-        <p className="desc">{s.description || "No description provided."}</p>
+        <Link href={`/script/${s.id}`} style={{ color: "inherit", textDecoration: "none" }}>
+          <h3>{s.title}</h3>
+          <p className="desc">{s.description || "No description provided."}</p>
+        </Link>
         {showTags && s.tags?.length ? (
           <div className="tags">
             {s.tags.slice(0, 3).map((t) => (
@@ -46,8 +57,17 @@ export default function ScriptCard({
             ))}
           </div>
         ) : null}
+        {executors.length ? (
+          <div className="tags executor-tags">
+            {executors.map((ex) => (
+              <span className="tag" key={ex!.id}>
+                {ex!.emoji} {ex!.name}
+              </span>
+            ))}
+          </div>
+        ) : null}
         <div className="meta">
-          <span className="who">
+          <Link href={`/u/${encodeURIComponent(s.author)}`} className="who">
             <span className="author-avatar">
               {s.authorAvatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -58,7 +78,7 @@ export default function ScriptCard({
             </span>
             @{s.author}
             <RoleBadges roles={s.authorRoles} size="sm" />
-          </span>
+          </Link>
           <span>· {timeAgo(s.createdAt)}</span>
         </div>
         <div className="card-stats">
@@ -72,7 +92,8 @@ export default function ScriptCard({
             📋 <b>{s.copies || 0}</b> copies
           </span>
         </div>
+        {manage ? <ScriptManageButtons scriptId={s.id} /> : null}
       </div>
-    </Link>
+    </article>
   );
 }

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { fmtBytes } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
 import TagInput from "@/components/TagInput";
+import ExecutorPicker from "@/components/ExecutorPicker";
 
 export default function UploadPage({ username }: { username: string }) {
   const router = useRouter();
@@ -102,6 +103,7 @@ export default function UploadPage({ username }: { username: string }) {
             </div>
           </div>
           <TagInput name="tags" />
+          <ExecutorPicker name="executors" />
           <div className="hint" style={{ marginTop: -8 }}>
             Author is set from your profile (@{username}).
           </div>

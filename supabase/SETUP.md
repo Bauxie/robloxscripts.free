@@ -6,6 +6,7 @@
 -- 2c. Run likes.sql (likes counter)
 -- 2d. Run profile_settings.sql (username cooldown, bio, avatars bucket)
 -- 2e. Run roles.sql (profile roles / badges)
+-- 2f. Run community.sql (executors, comments, reports, notifications, edit/delete RLS)
 -- 3. Supabase Dashboard → Authentication → URL Configuration
 --      Site URL: https://robloxscripts.free
 --      Redirect URLs include:
@@ -19,3 +20,5 @@
 --      NEXT_PUBLIC_SUPABASE_URL
 --      NEXT_PUBLIC_SUPABASE_ANON_KEY
 --      SUPABASE_SERVICE_ROLE_KEY
+--      SITE_OWNER_USERNAMES=yourname   (optional bootstrap Owner role)
+--      SITE_OWNER_IDS=uuid             (optional)

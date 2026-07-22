@@ -7,7 +7,7 @@ import ScriptCard from "@/components/ScriptCard";
 import LogoutButton from "@/components/LogoutButton";
 import ProfileSettings from "@/components/ProfileSettings";
 import RoleBadges from "@/components/RoleBadges";
-import { canManageRoles } from "@/lib/roles";
+import { canModerate } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -56,7 +56,13 @@ export default async function ProfilePage() {
             </div>
           </div>
           <div className="detail-cta">
-            {canManageRoles(profile.roles) ? (
+            <Link
+              href={`/u/${encodeURIComponent(profile.username)}`}
+              className="btn btn-ghost"
+            >
+              Public profile
+            </Link>
+            {canModerate(profile.roles) ? (
               <Link href="/admin" className="btn btn-ghost">
                 Admin
               </Link>
@@ -74,14 +80,14 @@ export default async function ProfilePage() {
       <div className="section-head" style={{ marginTop: 0 }}>
         <div>
           <h2>📜 My scripts</h2>
-          <p>Everything you’ve published while logged in.</p>
+          <p>Edit or delete anything you’ve published.</p>
         </div>
       </div>
 
       {mine.length ? (
         <div className="grid">
           {mine.map((s) => (
-            <ScriptCard key={s.id} s={s} />
+            <ScriptCard key={s.id} s={s} manage />
           ))}
         </div>
       ) : (
