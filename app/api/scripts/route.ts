@@ -61,7 +61,6 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get("content-type") || "";
     let title = "";
     let description = "";
-    let game = "";
     let gameLink = "";
     let tagsRaw: unknown = "";
     let code = "";
@@ -70,7 +69,6 @@ export async function POST(req: NextRequest) {
       const body = await req.json();
       title = (body.title || "").toString();
       description = (body.description || "").toString();
-      game = (body.game || "").toString();
       gameLink = (body.gameLink || body.game_url || body.gamePlaceId || "").toString();
       tagsRaw = body.tags;
       code = (body.code || "").toString();
@@ -78,7 +76,6 @@ export async function POST(req: NextRequest) {
       const form = await req.formData();
       title = (form.get("title") || "").toString();
       description = (form.get("description") || "").toString();
-      game = (form.get("game") || "").toString();
       gameLink = (form.get("gameLink") || form.get("game_url") || "").toString();
       tagsRaw = form.get("tags");
       code = (form.get("code") || "").toString();
@@ -90,14 +87,15 @@ export async function POST(req: NextRequest) {
 
     title = title.trim();
     description = description.trim().slice(0, 2000);
-    game = game.trim().slice(0, 80);
     const tags = sanitizeTags(tagsRaw);
 
     const gamePlaceId = parsePlaceId(gameLink);
     if (gameLink.trim() && !gamePlaceId) {
       return fail("Game link must be a Roblox games URL or place ID.", 400);
     }
-    if (gamePlaceId && !game) {
+
+    let game = "";
+    if (gamePlaceId) {
       const fetched = await getPlaceName(gamePlaceId);
       if (fetched) game = fetched.slice(0, 80);
     }

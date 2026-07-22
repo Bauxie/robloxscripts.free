@@ -74,23 +74,17 @@ export default function UploadPage({ username }: { username: string }) {
         </div>
 
         <form ref={formRef} className="form-grid" onSubmit={onSubmit}>
-          <div className="row2">
-            <div>
-              <label>
-                Title <span className="req">*</span>
-              </label>
-              <input
-                type="text"
-                name="title"
-                placeholder="e.g. Blade Ball Auto Parry"
-                maxLength={120}
-                required
-              />
-            </div>
-            <div>
-              <label>Game name</label>
-              <input type="text" name="game" placeholder="e.g. Blade Ball" maxLength={80} />
-            </div>
+          <div>
+            <label>
+              Title <span className="req">*</span>
+            </label>
+            <input
+              type="text"
+              name="title"
+              placeholder="e.g. Blade Ball Auto Parry"
+              maxLength={120}
+              required
+            />
           </div>
           <div>
             <label>Roblox game link</label>
@@ -101,7 +95,7 @@ export default function UploadPage({ username }: { username: string }) {
               inputMode="url"
             />
             <div className="hint">
-              Paste the Roblox game URL so visitors can open Play Game with the official thumbnail.
+              We’ll pull the game name and thumbnail from this link for Play Game.
             </div>
           </div>
           <div>
