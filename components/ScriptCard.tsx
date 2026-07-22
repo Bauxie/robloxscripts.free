@@ -15,8 +15,12 @@ export default function ScriptCard({
       className={`card${hot ? " card-hot" : ""}`}
       style={{ color: "inherit" }}
     >
-      {s.game ? <span className="badge-game">🎮 {s.game}</span> : null}
       <h3>{s.title}</h3>
+      {s.game ? (
+        <div className="card-game" title={s.game}>
+          🎮 {s.game}
+        </div>
+      ) : null}
       <p className="desc">{s.description || "No description provided."}</p>
       {s.tags?.length ? (
         <div className="tags">
@@ -34,6 +38,9 @@ export default function ScriptCard({
       <div className="card-stats">
         <span>
           👁 <b>{s.views}</b> views
+        </span>
+        <span>
+          ❤️ <b>{s.likes || 0}</b> likes
         </span>
         <span>
           📋 <b>{s.copies || 0}</b> copies

@@ -12,6 +12,7 @@ export type ScriptRecord = {
   code: string;
   views: number;
   copies: number;
+  likes: number;
   createdAt: string;
   userId?: string | null;
 };
@@ -33,6 +34,7 @@ type ScriptRow = {
   code: string;
   views: number | null;
   copies: number | null;
+  likes?: number | null;
   created_at: string;
   user_id?: string | null;
 };
@@ -51,6 +53,7 @@ function fromRow(row: ScriptRow): ScriptRecord {
     code: row.code,
     views: row.views || 0,
     copies: row.copies || 0,
+    likes: row.likes || 0,
     createdAt: row.created_at,
     userId: row.user_id ?? null,
   };
@@ -68,6 +71,7 @@ function toRow(s: ScriptRecord) {
     code: s.code,
     views: s.views,
     copies: s.copies,
+    likes: s.likes,
     created_at: s.createdAt,
     user_id: s.userId ?? null,
   };
@@ -84,6 +88,7 @@ export function publicView(s: ScriptRecord, includeCode = false): ScriptView {
     tags: s.tags,
     views: s.views,
     copies: s.copies,
+    likes: s.likes,
     createdAt: s.createdAt,
     userId: s.userId,
     lines: s.code ? s.code.split("\n").length : 0,
@@ -93,12 +98,24 @@ export function publicView(s: ScriptRecord, includeCode = false): ScriptView {
   return view;
 }
 
-export function sanitizeTags(raw: unknown): string[] {
+export function sanitizeTags(raw: unknown, gameName?: string): string[] {
   if (!raw) return [];
   const arr = Array.isArray(raw) ? raw : String(raw).split(",");
+  const game = (gameName || "").trim().toLowerCase();
+  const gameCompact = game.replace(/[^a-z0-9]+/g, "");
+
   return arr
-    .map((t) => String(t).trim().toLowerCase())
+    .map((t) => String(t).trim().toLowerCase().replace(/\s+/g, " "))
     .filter(Boolean)
+    .filter((t) => {
+      if (!gameCompact) return true;
+      const compact = t.replace(/[^a-z0-9]+/g, "");
+      if (compact === gameCompact) return false;
+      // Drop "Animal Hospital script" style tags — game name belongs on the game badge
+      if (compact.startsWith(gameCompact) && compact.endsWith("script")) return false;
+      if (t === `${game} script`) return false;
+      return true;
+    })
     .slice(0, 8);
 }
 
@@ -184,6 +201,17 @@ export async function incrementCopies(id: string): Promise<number | null> {
 
   const next = (current.copies || 0) + 1;
   const { error } = await supabase.from("scripts").update({ copies: next }).eq("id", id);
+  if (error) throw new Error(error.message);
+  return next;
+}
+
+export async function incrementLikes(id: string): Promise<number | null> {
+  const supabase = getAdminClient();
+  const current = await getScript(id);
+  if (!current) return null;
+
+  const next = (current.likes || 0) + 1;
+  const { error } = await supabase.from("scripts").update({ likes: next }).eq("id", id);
   if (error) throw new Error(error.message);
   return next;
 }

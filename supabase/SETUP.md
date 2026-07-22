@@ -3,6 +3,7 @@
 -- 1. Run schema.sql (scripts table)
 -- 2. Run auth.sql (profiles + user_id + RLS insert)
 -- 2b. Run game_link.sql (game_place_id for Play Game + thumbnails)
+-- 2c. Run likes.sql (likes counter)
 -- 3. Supabase Dashboard → Authentication → URL Configuration
 --      Site URL: https://robloxscripts.free
 --      Redirect URLs include:

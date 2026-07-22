@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ScriptView as ScriptViewType } from "@/lib/store";
 import { timeAgo, fmtBytes, highlightLua } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
@@ -13,6 +13,10 @@ type GamePreview = {
   playUrl: string;
 };
 
+function likeKey(id: string) {
+  return `liked:${id}`;
+}
+
 export default function ScriptView({
   s,
   game,
@@ -22,6 +26,16 @@ export default function ScriptView({
 }) {
   const toast = useToast();
   const html = useMemo(() => highlightLua(s.code || ""), [s.code]);
+  const [likes, setLikes] = useState(s.likes || 0);
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    try {
+      setLiked(localStorage.getItem(likeKey(s.id)) === "1");
+    } catch {
+      setLiked(false);
+    }
+  }, [s.id]);
 
   async function copy() {
     try {
@@ -30,6 +44,36 @@ export default function ScriptView({
       fetch(`/api/scripts/${s.id}/copy`, { method: "POST" }).catch(() => {});
     } catch {
       toast("Copy failed — select manually", true);
+    }
+  }
+
+  async function like() {
+    if (liked) {
+      toast("You already liked this");
+      return;
+    }
+    setLiked(true);
+    setLikes((n) => n + 1);
+    try {
+      localStorage.setItem(likeKey(s.id), "1");
+    } catch {
+      // ignore
+    }
+    try {
+      const res = await fetch(`/api/scripts/${s.id}/like`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Like failed");
+      if (typeof data.likes === "number") setLikes(data.likes);
+      toast("Liked! ❤️");
+    } catch {
+      setLiked(false);
+      setLikes((n) => Math.max(0, n - 1));
+      try {
+        localStorage.removeItem(likeKey(s.id));
+      } catch {
+        // ignore
+      }
+      toast("Couldn’t like right now", true);
     }
   }
 
@@ -71,6 +115,14 @@ export default function ScriptView({
             <button type="button" className="btn btn-primary" onClick={copy}>
               📋 Copy script
             </button>
+            <button
+              type="button"
+              className={`btn btn-ghost${liked ? " is-liked" : ""}`}
+              onClick={like}
+              disabled={liked}
+            >
+              {liked ? "❤️ Liked" : "🤍 Like"}
+            </button>
             <a className="btn btn-ghost" href={`/api/scripts/${s.id}/raw`}>
               ⬇ Download .lua
             </a>
@@ -111,6 +163,10 @@ export default function ScriptView({
           <div>
             <b>{s.views}</b>
             <span>Views</span>
+          </div>
+          <div>
+            <b>{likes}</b>
+            <span>Likes</span>
           </div>
           <div>
             <b>{s.copies || 0}</b>

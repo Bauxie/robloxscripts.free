@@ -90,7 +90,7 @@ export default function TagInput({
           value={draft}
           maxLength={MAX_TAG_LEN}
           disabled={tags.length >= max}
-          placeholder={tags.length ? "Add another…" : "e.g. animal hospital script"}
+          placeholder={tags.length ? "Add another…" : "e.g. op, autofarm, esp"}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={onKeyDown}
           onPaste={onPaste}
@@ -102,7 +102,7 @@ export default function TagInput({
       </div>
       <input type="hidden" name={name} value={tags.join(",")} />
       <div className="hint">
-        Type a tag and press <b>Enter</b> to add it · {tags.length}/{max}
+        Type a tag and press <b>Enter</b> · game name comes from the Roblox link · {tags.length}/{max}
       </div>
     </div>
   );

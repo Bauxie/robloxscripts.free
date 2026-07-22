@@ -87,7 +87,6 @@ export async function POST(req: NextRequest) {
 
     title = title.trim();
     description = description.trim().slice(0, 2000);
-    const tags = sanitizeTags(tagsRaw);
 
     const gamePlaceId = parsePlaceId(gameLink);
     if (gameLink.trim() && !gamePlaceId) {
@@ -99,6 +98,8 @@ export async function POST(req: NextRequest) {
       const fetched = await getPlaceName(gamePlaceId);
       if (fetched) game = fetched.slice(0, 80);
     }
+
+    const tags = sanitizeTags(tagsRaw, game);
 
     if (!title) return fail("A title is required.", 400);
     if (!code.trim()) return fail("Script code is required.", 400);
@@ -115,6 +116,7 @@ export async function POST(req: NextRequest) {
       code,
       views: 0,
       copies: 0,
+      likes: 0,
       createdAt: new Date().toISOString(),
       userId: user.id,
     };

@@ -12,12 +12,14 @@ create table if not exists public.scripts (
   code text not null,
   views integer not null default 0,
   copies integer not null default 0,
+  likes integer not null default 0,
   created_at timestamptz not null default now()
 );
 
 create index if not exists scripts_created_at_idx on public.scripts (created_at desc);
 create index if not exists scripts_views_idx on public.scripts (views desc);
 create index if not exists scripts_copies_idx on public.scripts (copies desc);
+create index if not exists scripts_likes_idx on public.scripts (likes desc);
 create index if not exists scripts_game_idx on public.scripts (game);
 create index if not exists scripts_game_place_id_idx
   on public.scripts (game_place_id)
