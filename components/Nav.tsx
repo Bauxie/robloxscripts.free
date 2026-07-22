@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth";
-import { canModerate } from "@/lib/roles";
-import LogoutButton from "@/components/LogoutButton";
-import RoleBadges from "@/components/RoleBadges";
-import NotificationsBell from "@/components/NotificationsBell";
+import MobileNav from "@/components/MobileNav";
 
 export default async function Nav() {
   let profile: Awaited<ReturnType<typeof getCurrentProfile>> = null;
@@ -22,47 +19,7 @@ export default async function Nav() {
           robloxscripts.<b>free</b>
         </span>
       </Link>
-      <nav className="nav-links">
-        <Link href="/scripts">Scripts</Link>
-        <Link href="/executors">Executors</Link>
-        <a
-          href="https://discord.gg/TaX9wg9seD"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="nav-discord"
-        >
-          Discord
-        </a>
-        {profile ? (
-          <>
-            {canModerate(profile.roles) ? <Link href="/admin">Admin</Link> : null}
-            <NotificationsBell />
-            <Link href={`/u/${encodeURIComponent(profile.username)}`} className="nav-profile">
-              <span className="nav-avatar">
-                {profile.avatar_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profile.avatar_url} alt="" width={28} height={28} />
-                ) : (
-                  <span aria-hidden>{(profile.username[0] || "?").toUpperCase()}</span>
-                )}
-              </span>
-              <span>@{profile.username}</span>
-              <RoleBadges roles={profile.roles} size="sm" />
-            </Link>
-            <Link href="/upload" className="btn btn-primary btn-sm">
-              ＋ Upload
-            </Link>
-            <LogoutButton className="btn btn-ghost btn-sm" />
-          </>
-        ) : (
-          <>
-            <Link href="/login">Log in</Link>
-            <Link href="/signup" className="btn btn-primary btn-sm">
-              Sign up
-            </Link>
-          </>
-        )}
-      </nav>
+      <MobileNav profile={profile} />
     </header>
   );
 }
