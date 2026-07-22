@@ -1,6 +1,7 @@
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { normalizeUsername, type Profile } from "@/lib/profile";
+import { normalizeRoles, withBootstrapOwner } from "@/lib/roles";
 
 export type { Profile } from "@/lib/profile";
 export {
@@ -10,6 +11,22 @@ export {
   usernameCooldownRemaining,
   validateUsername,
 } from "@/lib/profile";
+
+function mapProfile(row: Record<string, unknown>): Profile {
+  const base: Profile = {
+    id: String(row.id),
+    username: String(row.username),
+    avatar_url: (row.avatar_url as string | null) || null,
+    bio: String(row.bio || ""),
+    created_at: String(row.created_at),
+    username_changed_at: (row.username_changed_at as string | null) || null,
+    roles: normalizeRoles(row.roles),
+  };
+  return {
+    ...base,
+    roles: withBootstrapOwner(base, base.roles),
+  };
+}
 
 function slugUsername(raw: string): string {
   let base = normalizeUsername(raw);
@@ -25,16 +42,10 @@ async function ensureProfile(
   const admin = getAdminClient();
   const { data: existing } = await admin
     .from("profiles")
-    .select("id, username, avatar_url, bio, created_at, username_changed_at")
+    .select("id, username, avatar_url, bio, created_at, username_changed_at, roles")
     .eq("id", userId)
     .maybeSingle();
-  if (existing) {
-    return {
-      ...(existing as Profile),
-      bio: (existing as Profile).bio || "",
-      username_changed_at: (existing as Profile).username_changed_at || null,
-    };
-  }
+  if (existing) return mapProfile(existing as Record<string, unknown>);
 
   const preferred =
     (typeof meta?.full_name === "string" && meta.full_name) ||
@@ -57,17 +68,12 @@ async function ensureProfile(
             ? meta.avatar_url
             : null,
         bio: "",
+        roles: [],
       })
-      .select("id, username, avatar_url, bio, created_at, username_changed_at")
+      .select("id, username, avatar_url, bio, created_at, username_changed_at, roles")
       .single();
 
-    if (!error && data) {
-      return {
-        ...(data as Profile),
-        bio: (data as Profile).bio || "",
-        username_changed_at: (data as Profile).username_changed_at || null,
-      };
-    }
+    if (!error && data) return mapProfile(data as Record<string, unknown>);
     if (error?.code === "23505") {
       suffix += 1;
       continue;
@@ -93,18 +99,20 @@ export async function getCurrentProfile(): Promise<Profile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, avatar_url, bio, created_at, username_changed_at")
+    .select("id, username, avatar_url, bio, created_at, username_changed_at, roles")
     .eq("id", user.id)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  if (data) {
-    return {
-      ...(data as Profile),
-      bio: (data as Profile).bio || "",
-      username_changed_at: (data as Profile).username_changed_at || null,
-    };
-  }
+  if (data) return mapProfile(data as Record<string, unknown>);
 
   return ensureProfile(user.id, user.user_metadata as Record<string, unknown> | undefined, user.email);
+}
+
+export async function requireRoleManager(): Promise<Profile> {
+  const profile = await getCurrentProfile();
+  if (!profile) throw new Error("UNAUTHORIZED");
+  const { canManageRoles } = await import("@/lib/roles");
+  if (!canManageRoles(profile.roles)) throw new Error("FORBIDDEN");
+  return profile;
 }

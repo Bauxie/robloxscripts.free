@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ScriptView as ScriptViewType } from "@/lib/store";
 import { timeAgo, fmtBytes, highlightLua } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
+import RoleBadges from "@/components/RoleBadges";
 
 type GamePreview = {
   placeId: string;
@@ -97,7 +98,9 @@ export default function ScriptView({
                   <span aria-hidden>{(s.author[0] || "?").toUpperCase()}</span>
                 )}
               </span>
-              by <b>@{s.author}</b> · {timeAgo(s.createdAt)}
+              by <b>@{s.author}</b>
+              <RoleBadges roles={s.authorRoles} size="sm" />
+              <span>· {timeAgo(s.createdAt)}</span>
               {s.game ? (
                 <>
                   {" · "}

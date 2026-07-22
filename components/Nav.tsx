@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth";
+import { canManageRoles } from "@/lib/roles";
 import LogoutButton from "@/components/LogoutButton";
+import RoleBadges from "@/components/RoleBadges";
 
 export default async function Nav() {
   let profile: Awaited<ReturnType<typeof getCurrentProfile>> = null;
@@ -22,8 +24,17 @@ export default async function Nav() {
       <nav className="nav-links">
         <Link href="/scripts">Scripts</Link>
         <Link href="/executors">Executors</Link>
+        <a
+          href="https://discord.gg/TaX9wg9seD"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-discord"
+        >
+          Discord
+        </a>
         {profile ? (
           <>
+            {canManageRoles(profile.roles) ? <Link href="/admin">Admin</Link> : null}
             <Link href="/profile" className="nav-profile">
               <span className="nav-avatar">
                 {profile.avatar_url ? (
@@ -34,6 +45,7 @@ export default async function Nav() {
                 )}
               </span>
               <span>@{profile.username}</span>
+              <RoleBadges roles={profile.roles} size="sm" />
             </Link>
             <Link href="/upload" className="btn btn-primary btn-sm">
               ＋ Upload

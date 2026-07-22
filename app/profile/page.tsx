@@ -6,6 +6,8 @@ import { enrichScriptViews } from "@/lib/thumbnails";
 import ScriptCard from "@/components/ScriptCard";
 import LogoutButton from "@/components/LogoutButton";
 import ProfileSettings from "@/components/ProfileSettings";
+import RoleBadges from "@/components/RoleBadges";
+import { canManageRoles } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -43,7 +45,10 @@ export default async function ProfilePage() {
             </div>
             <div>
               <span className="eyebrow">Your shore</span>
-              <h1>@{profile.username}</h1>
+              <div className="profile-name-row">
+                <h1>@{profile.username}</h1>
+                <RoleBadges roles={profile.roles} size="lg" />
+              </div>
               {profile.bio ? <p className="profile-bio">{profile.bio}</p> : null}
               <p className="detail-sub">
                 {mine.length} script{mine.length === 1 ? "" : "s"} · {views} views · {likes} likes
@@ -51,6 +56,11 @@ export default async function ProfilePage() {
             </div>
           </div>
           <div className="detail-cta">
+            {canManageRoles(profile.roles) ? (
+              <Link href="/admin" className="btn btn-ghost">
+                Admin
+              </Link>
+            ) : null}
             <Link href="/upload" className="btn btn-primary">
               ＋ Upload
             </Link>

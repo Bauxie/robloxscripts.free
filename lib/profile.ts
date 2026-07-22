@@ -1,3 +1,5 @@
+import type { RoleId } from "@/lib/roles";
+
 export const USERNAME_COOLDOWN_DAYS = 7;
 
 export type Profile = {
@@ -7,6 +9,7 @@ export type Profile = {
   bio: string;
   created_at: string;
   username_changed_at: string | null;
+  roles: RoleId[];
 };
 
 export function normalizeUsername(raw: string): string {

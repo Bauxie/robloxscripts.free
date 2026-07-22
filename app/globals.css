@@ -1165,6 +1165,176 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   line-height: 1.45;
   max-width: 48ch;
 }
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.profile-name-row h1 {
+  margin: 0;
+}
+
+/* Role badges + tooltips */
+.role-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+.role-badge {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  box-shadow: 2px 2px 0 var(--line);
+  cursor: help;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+.role-badges-sm .role-badge {
+  width: 20px;
+  height: 20px;
+  box-shadow: 1px 1px 0 var(--line);
+}
+.role-badges-lg .role-badge {
+  width: 32px;
+  height: 32px;
+}
+.role-badge-icon {
+  font-size: 12px;
+  font-weight: 900;
+  font-family: "Fredoka", sans-serif;
+}
+.role-badges-sm .role-badge-icon { font-size: 10px; }
+.role-badges-lg .role-badge-icon { font-size: 14px; }
+.role-badge-verified {
+  border-radius: 8px;
+  clip-path: polygon(
+    50% 0%,
+    63% 12%,
+    79% 8%,
+    82% 24%,
+    98% 35%,
+    88% 50%,
+    98% 65%,
+    82% 76%,
+    79% 92%,
+    63% 88%,
+    50% 100%,
+    37% 88%,
+    21% 92%,
+    18% 76%,
+    2% 65%,
+    12% 50%,
+    2% 35%,
+    18% 24%,
+    21% 8%,
+    37% 12%
+  );
+  border: none;
+  box-shadow: none;
+  filter: drop-shadow(2px 2px 0 var(--line));
+}
+.role-badges-sm .role-badge-verified .role-badge-icon { font-size: 11px; }
+.role-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  background: #3d8ef0;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: "Nunito", sans-serif;
+  padding: 7px 10px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  box-shadow: 3px 3px 0 var(--line);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease;
+  z-index: 20;
+}
+.role-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #3d8ef0;
+}
+.role-badge:hover .role-tooltip,
+.role-badge:focus-visible .role-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.admin-search { max-width: 420px; margin-top: 8px; }
+.admin-user-list { display: grid; gap: 16px; }
+.admin-user-card { padding: 18px !important; }
+.admin-user-head { margin-bottom: 14px; }
+.admin-user-identity { display: flex; align-items: center; gap: 12px; }
+.admin-user-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: "Fredoka", sans-serif;
+  font-size: 18px;
+}
+.admin-role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.admin-role-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 3px solid var(--line);
+  border-radius: 16px;
+  background: #fffdf7;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+.admin-role-toggle.is-on {
+  background: #e8fbff;
+}
+.admin-role-toggle.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.admin-role-toggle input {
+  margin-top: 6px;
+}
+.admin-role-toggle b {
+  display: block;
+  font-family: "Fredoka", sans-serif;
+}
+.admin-role-toggle small {
+  display: block;
+  color: var(--ink-soft);
+  font-weight: 700;
+  line-height: 1.35;
+}
+.role-badge-static {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  box-shadow: 2px 2px 0 var(--line);
+}
+
 .profile-edit-grid {
   display: grid;
   grid-template-columns: minmax(180px, 240px) 1fr;

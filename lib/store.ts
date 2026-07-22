@@ -23,6 +23,7 @@ export type ScriptView = Omit<ScriptRecord, "code"> & {
   code?: string;
   thumbnailUrl?: string | null;
   authorAvatar?: string | null;
+  authorRoles?: import("@/lib/roles").RoleId[];
 };
 
 type ScriptRow = {

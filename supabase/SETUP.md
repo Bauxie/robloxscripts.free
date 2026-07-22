@@ -5,6 +5,7 @@
 -- 2b. Run game_link.sql (game_place_id for Play Game + thumbnails)
 -- 2c. Run likes.sql (likes counter)
 -- 2d. Run profile_settings.sql (username cooldown, bio, avatars bucket)
+-- 2e. Run roles.sql (profile roles / badges)
 -- 3. Supabase Dashboard → Authentication → URL Configuration
 --      Site URL: https://robloxscripts.free
 --      Redirect URLs include:

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ScriptView } from "@/lib/store";
 import { timeAgo } from "@/lib/format";
+import RoleBadges from "@/components/RoleBadges";
 
 export default function ScriptCard({
   s,
@@ -56,6 +57,7 @@ export default function ScriptCard({
               )}
             </span>
             @{s.author}
+            <RoleBadges roles={s.authorRoles} size="sm" />
           </span>
           <span>· {timeAgo(s.createdAt)}</span>
         </div>
