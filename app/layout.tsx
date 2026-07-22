@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   title: "robloxscripts.free — Upload & Share Roblox Scripts",
   description: "A cartoony beach home for uploading and sharing free Roblox scripts.",
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
 };
 
@@ -27,7 +28,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Nav />
           {children}
           <footer className="footer">
-            <span>🌊 robloxscripts.free</span>
+            <span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="" width={22} height={22} style={{ verticalAlign: "middle", marginRight: 8, borderRadius: 6, border: "2px solid var(--line)" }} />
+              robloxscripts.free
+            </span>
             <span className="muted">
               Made for the Roblox scripting community · Be kind, share responsibly.
             </span>

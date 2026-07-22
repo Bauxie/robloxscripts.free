@@ -13,7 +13,8 @@ export default async function Nav() {
   return (
     <header className="nav">
       <Link className="brand" href="/">
-        <span className="brand-mark">🌊</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="brand-mark" src="/logo.png" alt="RS" width={42} height={42} />
         <span className="brand-name">
           robloxscripts.<b>free</b>
         </span>
