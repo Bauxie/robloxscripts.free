@@ -12,7 +12,6 @@ export type RoleDef = {
   id: RoleId;
   label: string;
   description: string;
-  icon: string;
   color: string;
   bg: string;
 };
@@ -22,7 +21,6 @@ export const ROLE_DEFS: Record<RoleId, RoleDef> = {
     id: "owner",
     label: "Owner",
     description: "Site owner — full control",
-    icon: "👑",
     color: "#7a2e00",
     bg: "#ffd166",
   },
@@ -30,7 +28,6 @@ export const ROLE_DEFS: Record<RoleId, RoleDef> = {
     id: "admin",
     label: "Admin",
     description: "Administrator — can manage roles",
-    icon: "🛡️",
     color: "#0b3d91",
     bg: "#9ec5ff",
   },
@@ -38,7 +35,6 @@ export const ROLE_DEFS: Record<RoleId, RoleDef> = {
     id: "moderator",
     label: "Moderator",
     description: "Moderator — helps keep the shore clean",
-    icon: "🔨",
     color: "#5a2200",
     bg: "#ffb4a2",
   },
@@ -46,15 +42,13 @@ export const ROLE_DEFS: Record<RoleId, RoleDef> = {
     id: "content_creator",
     label: "Content Creator",
     description: "Content Creator — makes scripts & media",
-    icon: "🎬",
-    color: "#4a0066",
-    bg: "#e8b4ff",
+    color: "#fff",
+    bg: "#ff0033",
   },
   verified: {
     id: "verified",
     label: "Verified User",
     description: "Verified User — trusted uploader",
-    icon: "✓",
     color: "#fff",
     bg: "#3d8ef0",
   },

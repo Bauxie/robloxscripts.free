@@ -9,6 +9,7 @@ import {
   type RoleId,
 } from "@/lib/roles";
 import RoleBadges from "@/components/RoleBadges";
+import RoleIcon from "@/components/RoleIcon";
 import { useToast } from "@/components/ToastProvider";
 
 type AdminUser = {
@@ -196,7 +197,7 @@ export default function AdminPanel({
                         className="role-badge role-badge-static"
                         style={{ background: def.bg, color: def.color }}
                       >
-                        <span aria-hidden>{def.icon}</span>
+                        <RoleIcon role={role} />
                       </span>
                       <span>
                         <b>{def.label}</b>

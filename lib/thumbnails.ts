@@ -18,6 +18,18 @@ export async function withThumbnails(scripts: ScriptView[]): Promise<ScriptView[
   }));
 }
 
+function isMissingColumnError(error: { message?: string; code?: string } | null): boolean {
+  if (!error?.message) return false;
+  const msg = error.message.toLowerCase();
+  return (
+    msg.includes("does not exist") ||
+    msg.includes("could not find") ||
+    msg.includes("schema cache") ||
+    error.code === "PGRST204" ||
+    error.code === "42703"
+  );
+}
+
 /** Attach author avatar URLs + roles from profiles (by user_id). */
 export async function withAuthorAvatars(scripts: ScriptView[]): Promise<ScriptView[]> {
   const userIds = [
@@ -32,16 +44,22 @@ export async function withAuthorAvatars(scripts: ScriptView[]): Promise<ScriptVi
   }
 
   const admin = getAdminClient();
-  const { data, error } = await admin
-    .from("profiles")
-    .select("id, avatar_url, roles")
-    .in("id", userIds);
+  let data: Array<Record<string, unknown>> | null = null;
 
-  if (error) throw new Error(error.message);
+  const full = await admin.from("profiles").select("id, avatar_url, roles").in("id", userIds);
+  if (full.error && isMissingColumnError(full.error)) {
+    const basic = await admin.from("profiles").select("id, avatar_url").in("id", userIds);
+    if (basic.error) throw new Error(basic.error.message);
+    data = (basic.data || []) as Array<Record<string, unknown>>;
+  } else if (full.error) {
+    throw new Error(full.error.message);
+  } else {
+    data = (full.data || []) as Array<Record<string, unknown>>;
+  }
 
   const map = new Map<string, { avatar: string | null; roles: RoleId[] }>();
   for (const row of data || []) {
-    map.set(row.id as string, {
+    map.set(String(row.id), {
       avatar: (row.avatar_url as string | null) || null,
       roles: normalizeRoles(row.roles),
     });

@@ -2,6 +2,7 @@
 
 import type { RoleDef, RoleId } from "@/lib/roles";
 import { roleDefsFor } from "@/lib/roles";
+import RoleIcon from "@/components/RoleIcon";
 
 export default function RoleBadges({
   roles,
@@ -31,7 +32,7 @@ function RoleBadge({ role }: { role: RoleDef }) {
       aria-label={role.label}
     >
       <span className="role-badge-icon" aria-hidden>
-        {role.icon}
+        <RoleIcon role={role.id} />
       </span>
       <span className="role-tooltip" role="tooltip">
         {role.description}
