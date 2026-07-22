@@ -1,19 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { safeNextPath, safeRequestOrigin } from "@/lib/safeRedirect";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  let next = searchParams.get("next") || "/profile";
-  if (!next.startsWith("/")) next = "/profile";
-
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const isLocal = process.env.NODE_ENV === "development";
-  const redirectOrigin =
-    !isLocal && forwardedHost ? `https://${forwardedHost}` : origin;
+  const next = safeNextPath(searchParams.get("next"), "/profile");
+  const redirectOrigin = safeRequestOrigin(request.url);
 
   const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "")
     .trim()

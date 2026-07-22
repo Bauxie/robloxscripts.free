@@ -4,11 +4,12 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
+import { safeNextPath } from "@/lib/safeRedirect";
 
 export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/profile";
+  const next = safeNextPath(searchParams.get("next"), "/profile");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

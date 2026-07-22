@@ -91,6 +91,10 @@ export async function POST(req: NextRequest) {
       code = (form.get("code") || "").toString();
       const file = form.get("file");
       if (file && typeof file !== "string") {
+        const size = typeof file.size === "number" ? file.size : 0;
+        if (size > MAX_CODE) {
+          return fail("Script is too large (max 500 KB).", 400);
+        }
         code = Buffer.from(await file.arrayBuffer()).toString("utf8");
       }
     }

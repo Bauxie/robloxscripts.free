@@ -170,7 +170,7 @@ export default function BeachHero({
       </div>
 
       <div className="hero-content">
-        <span className="pill">🏄 Cartoon script hub — free forever</span>
+        <span className="pill">🏄 Robloxscripts — free forever</span>
         <h1>
           Find &amp; share <span className="grad">Roblox scripts</span>
           <br />

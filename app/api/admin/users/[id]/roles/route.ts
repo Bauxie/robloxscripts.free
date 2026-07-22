@@ -66,14 +66,14 @@ export async function PATCH(
       }
     }
 
-    // Don't leave the site with zero owners if targeting a bootstrap/owner
+    // Never leave the site with zero DB owners
     if (removed.includes("owner")) {
       const { data: owners } = await admin
         .from("profiles")
         .select("id")
         .contains("roles", ["owner"]);
       const otherOwners = (owners || []).filter((o) => o.id !== params.id);
-      if (!otherOwners.length && !actorRoles.includes("owner")) {
+      if (!otherOwners.length) {
         return fail("Cannot remove the last Owner.", 400);
       }
     }

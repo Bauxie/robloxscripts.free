@@ -20,6 +20,38 @@ function extFor(mime: string): string {
   return "jpg";
 }
 
+function sniffImageMime(buf: Buffer): string | null {
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (
+    buf.length >= 8 &&
+    buf[0] === 0x89 &&
+    buf[1] === 0x50 &&
+    buf[2] === 0x4e &&
+    buf[3] === 0x47
+  ) {
+    return "image/png";
+  }
+  if (
+    buf.length >= 6 &&
+    buf[0] === 0x47 &&
+    buf[1] === 0x49 &&
+    buf[2] === 0x46 &&
+    buf[3] === 0x38
+  ) {
+    return "image/gif";
+  }
+  if (
+    buf.length >= 12 &&
+    buf.toString("ascii", 0, 4) === "RIFF" &&
+    buf.toString("ascii", 8, 12) === "WEBP"
+  ) {
+    return "image/webp";
+  }
+  return null;
+}
+
 // POST /api/profile/avatar — multipart file field "avatar"
 export async function POST(req: NextRequest) {
   try {
@@ -38,19 +70,28 @@ export async function POST(req: NextRequest) {
       return fail("Choose an image to upload.", 400);
     }
 
-    const mime = file.type || "application/octet-stream";
-    if (!ALLOWED.has(mime)) {
-      return fail("Use a JPG, PNG, WebP, or GIF image.", 400);
-    }
     if (file.size > MAX_BYTES) {
       return fail("Image must be under 2 MB.", 400);
     }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const sniffed = sniffImageMime(buffer);
+    const claimed = file.type || "application/octet-stream";
+    if (!sniffed || !ALLOWED.has(sniffed) || (ALLOWED.has(claimed) && claimed !== sniffed)) {
+      // Allow claimed mismatch only if claimed is empty/octet-stream; otherwise require match
+      if (!sniffed || !ALLOWED.has(sniffed)) {
+        return fail("Use a JPG, PNG, WebP, or GIF image.", 400);
+      }
+      if (ALLOWED.has(claimed) && claimed !== sniffed) {
+        return fail("Image type does not match file contents.", 400);
+      }
+    }
+    const mime = sniffed;
 
     const ext = extFor(mime);
     const path = `${user.id}/avatar.${ext}`;
     // Prefer a stable png name when uploading cropped circle avatars
     const uploadPath = mime === "image/png" ? `${user.id}/avatar.png` : path;
-    const buffer = Buffer.from(await file.arrayBuffer());
 
     const { error: uploadError } = await supabase.storage.from("avatars").upload(uploadPath, buffer, {
       contentType: mime,

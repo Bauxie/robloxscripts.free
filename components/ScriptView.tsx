@@ -73,9 +73,21 @@ export default function ScriptView({
     try {
       const res = await fetch(`/api/scripts/${s.id}/like`, { method: "POST" });
       const data = await res.json();
+      if (res.status === 401) {
+        setLiked(false);
+        setLikes((n) => Math.max(0, n - 1));
+        try {
+          localStorage.removeItem(likeKey(s.id));
+        } catch {
+          // ignore
+        }
+        toast("Log in to like scripts", true);
+        return;
+      }
       if (!res.ok) throw new Error(data.error || "Like failed");
       if (typeof data.likes === "number") setLikes(data.likes);
-      toast("Liked! ❤️");
+      if (data.alreadyLiked) toast("You already liked this");
+      else toast("Liked! ❤️");
     } catch {
       setLiked(false);
       setLikes((n) => Math.max(0, n - 1));
