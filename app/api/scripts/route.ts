@@ -10,6 +10,7 @@ import {
 } from "@/lib/store";
 import { getSupabaseConfigError } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { parsePlaceId, getPlaceName } from "@/lib/roblox";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,6 +62,7 @@ export async function POST(req: NextRequest) {
     let title = "";
     let description = "";
     let game = "";
+    let gameLink = "";
     let tagsRaw: unknown = "";
     let code = "";
 
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
       title = (body.title || "").toString();
       description = (body.description || "").toString();
       game = (body.game || "").toString();
+      gameLink = (body.gameLink || body.game_url || body.gamePlaceId || "").toString();
       tagsRaw = body.tags;
       code = (body.code || "").toString();
     } else {
@@ -76,6 +79,7 @@ export async function POST(req: NextRequest) {
       title = (form.get("title") || "").toString();
       description = (form.get("description") || "").toString();
       game = (form.get("game") || "").toString();
+      gameLink = (form.get("gameLink") || form.get("game_url") || "").toString();
       tagsRaw = form.get("tags");
       code = (form.get("code") || "").toString();
       const file = form.get("file");
@@ -89,6 +93,15 @@ export async function POST(req: NextRequest) {
     game = game.trim().slice(0, 80);
     const tags = sanitizeTags(tagsRaw);
 
+    const gamePlaceId = parsePlaceId(gameLink);
+    if (gameLink.trim() && !gamePlaceId) {
+      return fail("Game link must be a Roblox games URL or place ID.", 400);
+    }
+    if (gamePlaceId && !game) {
+      const fetched = await getPlaceName(gamePlaceId);
+      if (fetched) game = fetched.slice(0, 80);
+    }
+
     if (!title) return fail("A title is required.", 400);
     if (!code.trim()) return fail("Script code is required.", 400);
     if (code.length > MAX_CODE) return fail("Script is too large (max 500 KB).", 400);
@@ -99,6 +112,7 @@ export async function POST(req: NextRequest) {
       description,
       author: author.slice(0, 60),
       game,
+      gamePlaceId,
       tags,
       code,
       views: 0,

@@ -88,8 +88,20 @@ export default function UploadPage({ username }: { username: string }) {
               />
             </div>
             <div>
-              <label>Game</label>
+              <label>Game name</label>
               <input type="text" name="game" placeholder="e.g. Blade Ball" maxLength={80} />
+            </div>
+          </div>
+          <div>
+            <label>Roblox game link</label>
+            <input
+              type="text"
+              name="gameLink"
+              placeholder="https://www.roblox.com/games/123456789/Your-Game"
+              inputMode="url"
+            />
+            <div className="hint">
+              Paste the Roblox game URL so visitors can open Play Game with the official thumbnail.
             </div>
           </div>
           <div>

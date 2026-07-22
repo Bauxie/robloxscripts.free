@@ -7,6 +7,7 @@ create table if not exists public.scripts (
   description text not null default '',
   author text not null default 'Anonymous',
   game text not null default '',
+  game_place_id text,
   tags text[] not null default '{}',
   code text not null,
   views integer not null default 0,
@@ -18,6 +19,9 @@ create index if not exists scripts_created_at_idx on public.scripts (created_at 
 create index if not exists scripts_views_idx on public.scripts (views desc);
 create index if not exists scripts_copies_idx on public.scripts (copies desc);
 create index if not exists scripts_game_idx on public.scripts (game);
+create index if not exists scripts_game_place_id_idx
+  on public.scripts (game_place_id)
+  where game_place_id is not null;
 
 -- Server uses the service role key, which bypasses RLS.
 -- Keep RLS on so the anon key cannot write freely if it ever leaks to the client.

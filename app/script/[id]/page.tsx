@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { incrementViews, publicView } from "@/lib/store";
+import { resolveRobloxGame } from "@/lib/roblox";
 import ScriptView from "@/components/ScriptView";
 
 export const dynamic = "force-dynamic";
@@ -28,5 +29,21 @@ export default async function ScriptPage({ params }: { params: { id: string } })
     );
   }
 
-  return <ScriptView s={publicView(record, true)} />;
+  let game = null;
+  if (record.gamePlaceId) {
+    try {
+      game = await resolveRobloxGame(record.gamePlaceId, {
+        fetchName: !record.game,
+      });
+    } catch {
+      game = {
+        placeId: record.gamePlaceId,
+        name: record.game || null,
+        thumbnailUrl: null,
+        playUrl: `https://www.roblox.com/games/${record.gamePlaceId}`,
+      };
+    }
+  }
+
+  return <ScriptView s={publicView(record, true)} game={game} />;
 }

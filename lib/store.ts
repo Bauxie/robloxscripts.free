@@ -7,6 +7,7 @@ export type ScriptRecord = {
   description: string;
   author: string;
   game: string;
+  gamePlaceId: string | null;
   tags: string[];
   code: string;
   views: number;
@@ -27,6 +28,7 @@ type ScriptRow = {
   description: string | null;
   author: string | null;
   game: string | null;
+  game_place_id?: string | null;
   tags: string[] | null;
   code: string;
   views: number | null;
@@ -44,6 +46,7 @@ function fromRow(row: ScriptRow): ScriptRecord {
     description: row.description || "",
     author: row.author || "Anonymous",
     game: row.game || "",
+    gamePlaceId: row.game_place_id || null,
     tags: row.tags || [],
     code: row.code,
     views: row.views || 0,
@@ -60,6 +63,7 @@ function toRow(s: ScriptRecord) {
     description: s.description,
     author: s.author,
     game: s.game,
+    game_place_id: s.gamePlaceId,
     tags: s.tags,
     code: s.code,
     views: s.views,
@@ -76,6 +80,7 @@ export function publicView(s: ScriptRecord, includeCode = false): ScriptView {
     description: s.description,
     author: s.author,
     game: s.game,
+    gamePlaceId: s.gamePlaceId,
     tags: s.tags,
     views: s.views,
     copies: s.copies,
