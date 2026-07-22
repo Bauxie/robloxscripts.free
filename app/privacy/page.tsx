@@ -35,7 +35,8 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong>Usage data</strong> — pages viewed, script views/copies/likes, approximate device
-          and browser info, and similar analytics needed to run the Site.
+          and browser info, and analytics (including Google Analytics) needed to run and improve the
+          Site.
         </li>
         <li>
           <strong>Cookies &amp; local storage</strong> — session cookies for login, preferences (for

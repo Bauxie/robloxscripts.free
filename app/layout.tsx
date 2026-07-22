@@ -3,6 +3,7 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import ToastProvider from "@/components/ToastProvider";
 import AdSenseLoader from "@/components/AdSenseLoader";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CookieConsent from "@/components/CookieConsent";
 import Link from "next/link";
 
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <GoogleAnalytics />
         <AdSenseLoader />
         <ToastProvider>
           <Nav />
