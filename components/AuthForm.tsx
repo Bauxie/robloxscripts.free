@@ -12,7 +12,12 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const rawError = searchParams.get("error") || "";
+  const [error, setError] = useState(
+    rawError === "auth"
+      ? "Sign-in didn’t finish. Try Discord again, or use email."
+      : rawError
+  );
   const [info, setInfo] = useState("");
   const [busy, setBusy] = useState(false);
 
