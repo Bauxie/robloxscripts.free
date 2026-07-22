@@ -166,6 +166,7 @@ a { color: inherit; text-decoration: none; }
 .bird::after { left: 8px; transform: rotate(45deg) scaleX(-1); }
 .bird-1 { top: 100px; left: -40px; animation: fly 26s linear infinite; }
 .bird-2 { top: 140px; left: -40px; transform: scale(.7); animation: fly 32s linear infinite 8s; }
+.bird-3 { top: 80px; left: -40px; transform: scale(.85); animation: fly 38s linear infinite 14s; opacity: .55; }
 @keyframes flap { 0%,100%{ height: 11px;} 50%{ height: 5px;} }
 @keyframes fly { from { transform: translate(0,0);} 50%{ transform: translate(55vw,-30px);} to { transform: translate(110vw,10px);} }
 
@@ -244,22 +245,143 @@ a { color: inherit; text-decoration: none; }
   background: conic-gradient(#ff5d5d 0 25%, #fff 0 50%, #ffd166 0 75%, #fff 0);
   border: 3px solid var(--line);
   box-shadow: inset -4px -4px 0 rgba(0,0,0,.08), 3px 3px 0 rgba(26,47,61,.2);
-  animation: roll 6s ease-in-out infinite;
+  animation: roll 6s ease-in-out infinite; z-index: 3;
 }
 @keyframes roll { 0%,100%{ transform: translateY(0) rotate(0);} 50%{ transform: translateY(-26px) rotate(180deg);} }
 .starfish {
   position: absolute; right: 30%; bottom: 30px; width: 26px; height: 26px; background: #ff8a5c;
   clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
-  filter: drop-shadow(2px 2px 0 rgba(26,47,61,.25)); transform: rotate(12deg);
+  filter: drop-shadow(2px 2px 0 rgba(26,47,61,.25)); transform: rotate(12deg); z-index: 2;
 }
 .shell {
   position: absolute; right: 44%; bottom: 26px; width: 20px; height: 18px; background: #ffb3c1;
-  border: 2px solid var(--line); border-radius: 50% 50% 8px 8px;
+  border: 2px solid var(--line); border-radius: 50% 50% 8px 8px; z-index: 2;
 }
 .shell::before, .shell::after {
   content:""; position:absolute; top:2px; width:2px; height:12px; background: rgba(160,60,90,.55);
 }
 .shell::before { left: 8px; } .shell::after { left: 12px; }
+
+/* Beach umbrellas */
+.umbrella {
+  position: absolute; z-index: 4; width: 88px; height: 96px;
+  filter: drop-shadow(3px 3px 0 rgba(26,47,61,.18));
+}
+.umbrella-a { right: 8%; bottom: 52px; transform: rotate(4deg); }
+.umbrella-b { right: 36%; bottom: 38px; transform: rotate(-6deg) scale(.86); }
+.umb-pole {
+  position: absolute; left: 50%; bottom: 0; width: 5px; height: 62px;
+  margin-left: -2.5px; background: #c08a4d; border: 2px solid var(--line); border-radius: 3px;
+}
+.umb-canopy {
+  position: absolute; left: 50%; top: 0; width: 86px; height: 42px;
+  margin-left: -43px;
+  background: repeating-linear-gradient(90deg, #ff5d5d 0 14px, #fff 14px 28px, #4f97f7 28px 42px, #fff 42px 56px, #ffd166 56px 70px, #fff 70px 86px);
+  border: 3px solid var(--line);
+  border-radius: 50% 50% 8px 8px / 100% 100% 18% 18%;
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,.06);
+  transform-origin: 50% 100%;
+  animation: umbSway 4.5s ease-in-out infinite;
+}
+.umbrella-b .umb-canopy {
+  background: repeating-linear-gradient(90deg, #35c1e0 0 14px, #fff8ec 14px 28px, #ff8a5c 28px 42px, #fff8ec 42px 56px, #7fd884 56px 70px, #fff8ec 70px 86px);
+  animation-delay: -1.5s;
+}
+@keyframes umbSway { 0%,100%{ transform: rotate(-2deg);} 50%{ transform: rotate(2deg);} }
+
+/* Beach towels */
+.towel {
+  position: absolute; z-index: 2; width: 54px; height: 78px;
+  border: 3px solid var(--line); border-radius: 8px;
+  box-shadow: 3px 3px 0 rgba(26,47,61,.15);
+  transform-origin: center;
+}
+.towel-a {
+  right: 11%; bottom: 18px; transform: rotate(12deg);
+  background:
+    linear-gradient(#fff8ec, #fff8ec) center / 100% 10px no-repeat,
+    repeating-linear-gradient(0deg, #ff6b6b 0 12px, #fff8ec 12px 18px, #4f97f7 18px 30px, #fff8ec 30px 36px);
+}
+.towel-b {
+  right: 40%; bottom: 12px; transform: rotate(-8deg); width: 48px; height: 68px;
+  background:
+    linear-gradient(#fff8ec, #fff8ec) center / 100% 8px no-repeat,
+    repeating-linear-gradient(0deg, #35c1e0 0 10px, #ffd166 10px 20px, #fff8ec 20px 26px);
+}
+
+/* Sand castles */
+.sandcastle {
+  position: absolute; z-index: 3; width: 70px; height: 58px;
+  filter: drop-shadow(3px 3px 0 rgba(26,47,61,.16));
+}
+.sandcastle-a { left: 34%; bottom: 22px; }
+.sandcastle-b { right: 52%; bottom: 36px; transform: scale(.82); }
+.sandcastle .keep {
+  position: absolute; left: 14px; bottom: 0; width: 42px; height: 34px;
+  background: #efd09a; border: 3px solid var(--line); border-radius: 4px 4px 2px 2px;
+}
+.sandcastle .keep::before {
+  content: ""; position: absolute; top: -10px; left: -3px; right: -3px; height: 12px;
+  background:
+    linear-gradient(90deg,
+      #efd09a 0 10px, transparent 10px 14px,
+      #efd09a 14px 24px, transparent 24px 28px,
+      #efd09a 28px 38px, transparent 38px 42px,
+      #efd09a 42px 52px);
+  border: 3px solid var(--line); border-bottom: none; box-sizing: border-box;
+}
+.sandcastle .tower {
+  position: absolute; bottom: 0; width: 18px; height: 44px;
+  background: #e4c07f; border: 3px solid var(--line); border-radius: 3px;
+}
+.sandcastle .tower::before {
+  content: ""; position: absolute; top: -9px; left: -3px; right: -3px; height: 10px;
+  background:
+    linear-gradient(90deg, #e4c07f 0 6px, transparent 6px 10px, #e4c07f 10px 16px, transparent 16px 20px, #e4c07f 20px 26px);
+  border: 3px solid var(--line); border-bottom: none; box-sizing: border-box;
+}
+.sandcastle .tower-l { left: 0; }
+.sandcastle .tower-r { right: 0; height: 38px; }
+.sandcastle .door {
+  position: absolute; left: 50%; bottom: 0; width: 12px; height: 16px;
+  margin-left: -6px; background: #c08a4d; border: 2px solid var(--line);
+  border-radius: 10px 10px 0 0; z-index: 1;
+}
+.sandcastle .flag {
+  position: absolute; left: 50%; top: -22px; width: 3px; height: 22px;
+  margin-left: -1.5px; background: var(--line);
+}
+.sandcastle .flag::after {
+  content: ""; position: absolute; top: 0; left: 3px; width: 14px; height: 10px;
+  background: #ff5d5d; border: 2px solid var(--line); border-radius: 2px;
+  animation: flagWave 1.8s ease-in-out infinite;
+  transform-origin: left center;
+}
+.sandcastle-b .flag::after { background: #4f97f7; }
+@keyframes flagWave { 0%,100%{ transform: skewY(0deg);} 50%{ transform: skewY(8deg);} }
+
+/* Seagulls standing on sand */
+.seagull {
+  position: absolute; z-index: 4; width: 28px; height: 22px;
+  animation: gullBob 2.8s ease-in-out infinite;
+}
+.seagull-a { right: 24%; bottom: 58px; }
+.seagull-b { right: 28%; bottom: 48px; transform: scale(.85); animation-delay: -.8s; }
+.seagull-c { left: 42%; bottom: 44px; animation: gullBobFlip 2.8s ease-in-out infinite; animation-delay: -1.4s; }
+.seagull::before {
+  content: ""; position: absolute; left: 4px; top: 6px; width: 18px; height: 12px;
+  background: #fff; border: 2.5px solid var(--line); border-radius: 50% 50% 40% 40%;
+}
+.seagull::after {
+  content: ""; position: absolute; right: 0; top: 2px; width: 10px; height: 10px;
+  background: #fff; border: 2.5px solid var(--line); border-radius: 50%;
+  box-shadow: 7px 4px 0 -3px #ffb020;
+}
+@keyframes gullBob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-3px);} }
+@keyframes gullBobFlip {
+  0%,100%{ transform: scaleX(-1) scale(.9) translateY(0); }
+  50%{ transform: scaleX(-1) scale(.9) translateY(-3px); }
+}
 
 /* Hero content */
 .hero-content {

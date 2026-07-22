@@ -101,6 +101,7 @@ export default function BeachHero({
         <div className="cloud cloud-3" />
         <div className="bird bird-1" />
         <div className="bird bird-2" />
+        <div className="bird bird-3" />
 
         <div className="ocean">
           <svg className="wave wave-back" viewBox="0 0 1440 220" preserveAspectRatio="none">
@@ -124,6 +125,41 @@ export default function BeachHero({
         </div>
 
         <div className="beach">
+          {/* umbrellas */}
+          <div className="umbrella umbrella-a">
+            <span className="umb-canopy" />
+            <span className="umb-pole" />
+          </div>
+          <div className="umbrella umbrella-b">
+            <span className="umb-canopy" />
+            <span className="umb-pole" />
+          </div>
+
+          {/* towels */}
+          <div className="towel towel-a" />
+          <div className="towel towel-b" />
+
+          {/* sand castles */}
+          <div className="sandcastle sandcastle-a">
+            <span className="keep" />
+            <span className="tower tower-l" />
+            <span className="tower tower-r" />
+            <span className="door" />
+            <span className="flag" />
+          </div>
+          <div className="sandcastle sandcastle-b">
+            <span className="keep" />
+            <span className="tower tower-l" />
+            <span className="tower tower-r" />
+            <span className="door" />
+            <span className="flag" />
+          </div>
+
+          {/* seagulls on the sand */}
+          <div className="seagull seagull-a" />
+          <div className="seagull seagull-b" />
+          <div className="seagull seagull-c" />
+
           <div className="ball" />
           <div className="starfish" />
           <div className="shell" />
