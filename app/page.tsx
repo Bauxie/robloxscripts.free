@@ -4,6 +4,7 @@ import { enrichScriptViews } from "@/lib/thumbnails";
 import { getSupabaseConfigError } from "@/lib/supabase";
 import BeachHero from "@/components/BeachHero";
 import ScriptCard from "@/components/ScriptCard";
+import AdUnit from "@/components/AdUnit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -89,6 +90,11 @@ export default async function HomePage() {
               </div>
             </>
           ) : null}
+
+          <AdUnit
+            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME || ""}
+            className="ad-slot-home"
+          />
 
           <div className="section-head">
             <div>

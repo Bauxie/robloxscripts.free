@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import ToastProvider from "@/components/ToastProvider";
+import AdSenseLoader from "@/components/AdSenseLoader";
+import CookieConsent from "@/components/CookieConsent";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://robloxscripts.free"),
@@ -54,19 +57,45 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <AdSenseLoader />
         <ToastProvider>
           <Nav />
           {children}
           <footer className="footer">
             <span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="" width={22} height={22} style={{ verticalAlign: "middle", marginRight: 8, borderRadius: 6, border: "2px solid var(--line)" }} />
+              <img
+                src="/logo.png"
+                alt=""
+                width={22}
+                height={22}
+                style={{
+                  verticalAlign: "middle",
+                  marginRight: 8,
+                  borderRadius: 6,
+                  border: "2px solid var(--line)",
+                }}
+              />
               robloxscripts.free
             </span>
+            <nav className="footer-links">
+              <Link href="/about">About</Link>
+              <Link href="/contact">Contact</Link>
+              <Link href="/privacy">Privacy</Link>
+              <Link href="/terms">Terms</Link>
+              <a
+                href="https://discord.gg/TaX9wg9seD"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Discord
+              </a>
+            </nav>
             <span className="muted">
-              Made for the Roblox scripting community · Be kind, share responsibly.
+              Not affiliated with Roblox Corporation · Be kind, share responsibly.
             </span>
           </footer>
+          <CookieConsent />
         </ToastProvider>
       </body>
     </html>

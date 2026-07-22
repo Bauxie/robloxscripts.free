@@ -8,6 +8,7 @@ import { useToast } from "@/components/ToastProvider";
 import RoleBadges from "@/components/RoleBadges";
 import CommentsSection from "@/components/CommentsSection";
 import ReportButton from "@/components/ReportButton";
+import AdUnit from "@/components/AdUnit";
 import { EXECUTORS } from "@/lib/executors";
 
 type GamePreview = {
@@ -197,6 +198,11 @@ export default function ScriptView({
             {s.description}
           </p>
         ) : null}
+
+        <AdUnit
+          slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SCRIPT || ""}
+          className="ad-slot-script"
+        />
 
         {game ? (
           <a

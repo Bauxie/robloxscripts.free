@@ -37,6 +37,10 @@ export async function GET() {
     urlEntry(SITE, { changefreq: "hourly", priority: "1.0" }),
     urlEntry(`${SITE}/scripts`, { changefreq: "hourly", priority: "0.9" }),
     urlEntry(`${SITE}/executors`, { changefreq: "weekly", priority: "0.6" }),
+    urlEntry(`${SITE}/about`, { changefreq: "monthly", priority: "0.4" }),
+    urlEntry(`${SITE}/contact`, { changefreq: "monthly", priority: "0.4" }),
+    urlEntry(`${SITE}/privacy`, { changefreq: "monthly", priority: "0.3" }),
+    urlEntry(`${SITE}/terms`, { changefreq: "monthly", priority: "0.3" }),
   ];
 
   try {
