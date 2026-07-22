@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { listScripts, publicView } from "@/lib/store";
-import { withThumbnails } from "@/lib/thumbnails";
+import { enrichScriptViews } from "@/lib/thumbnails";
 import { getSupabaseConfigError } from "@/lib/supabase";
 import BeachHero from "@/components/BeachHero";
 import ScriptCard from "@/components/ScriptCard";
@@ -25,14 +25,14 @@ export default async function HomePage() {
   const scriptCount = all.length;
   const viewCount = all.reduce((a, s) => a + (s.views || 0), 0);
 
-  const latest = await withThumbnails(
+  const latest = await enrichScriptViews(
     [...all]
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
       .slice(0, 6)
       .map((s) => publicView(s))
   );
 
-  const trending = await withThumbnails(
+  const trending = await enrichScriptViews(
     [...all]
       .map((s) => ({ s, score: (s.views || 0) + (s.copies || 0) * 3 }))
       .filter((x) => x.score > 0)

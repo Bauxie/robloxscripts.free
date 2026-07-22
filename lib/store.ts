@@ -22,6 +22,7 @@ export type ScriptView = Omit<ScriptRecord, "code"> & {
   size: number;
   code?: string;
   thumbnailUrl?: string | null;
+  authorAvatar?: string | null;
 };
 
 type ScriptRow = {

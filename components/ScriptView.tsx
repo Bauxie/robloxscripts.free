@@ -88,7 +88,15 @@ export default function ScriptView({
         <div className="detail-head">
           <div>
             <h1>{s.title}</h1>
-            <div className="detail-sub">
+            <div className="detail-sub detail-author">
+              <span className="author-avatar author-avatar-md">
+                {s.authorAvatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.authorAvatar} alt="" width={28} height={28} />
+                ) : (
+                  <span aria-hidden>{(s.author[0] || "?").toUpperCase()}</span>
+                )}
+              </span>
               by <b>@{s.author}</b> · {timeAgo(s.createdAt)}
               {s.game ? (
                 <>

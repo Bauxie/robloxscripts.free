@@ -48,16 +48,18 @@ export async function POST(req: NextRequest) {
 
     const ext = extFor(mime);
     const path = `${user.id}/avatar.${ext}`;
+    // Prefer a stable png name when uploading cropped circle avatars
+    const uploadPath = mime === "image/png" ? `${user.id}/avatar.png` : path;
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { error: uploadError } = await supabase.storage.from("avatars").upload(path, buffer, {
+    const { error: uploadError } = await supabase.storage.from("avatars").upload(uploadPath, buffer, {
       contentType: mime,
       upsert: true,
       cacheControl: "3600",
     });
     if (uploadError) return fail(uploadError.message, 400);
 
-    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+    const { data: pub } = supabase.storage.from("avatars").getPublicUrl(uploadPath);
     const avatarUrl = `${pub.publicUrl}?v=${Date.now()}`;
 
     const { data, error } = await supabase

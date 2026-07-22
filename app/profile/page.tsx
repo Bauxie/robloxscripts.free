@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import { listScripts, publicView } from "@/lib/store";
-import { withThumbnails } from "@/lib/thumbnails";
+import { enrichScriptViews } from "@/lib/thumbnails";
 import ScriptCard from "@/components/ScriptCard";
 import LogoutButton from "@/components/LogoutButton";
 import ProfileSettings from "@/components/ProfileSettings";
@@ -18,7 +18,7 @@ export default async function ProfilePage() {
   const profile = await getCurrentProfile();
   if (!profile) redirect("/login?next=/profile");
 
-  const mine = await withThumbnails(
+  const mine = await enrichScriptViews(
     (await listScripts({ userId: profile.id, sort: "new" })).map((s) => publicView(s))
   );
   const views = mine.reduce((a, s) => a + (s.views || 0), 0);

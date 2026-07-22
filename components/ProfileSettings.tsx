@@ -11,6 +11,7 @@ import {
   validateUsername,
 } from "@/lib/profile";
 import { useToast } from "@/components/ToastProvider";
+import AvatarCropModal from "@/components/AvatarCropModal";
 
 export default function ProfileSettings({ profile }: { profile: Profile }) {
   const router = useRouter();
@@ -22,11 +23,9 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
 
-  const remaining = useMemo(
-    () => usernameCooldownRemaining(profile),
-    [profile]
-  );
+  const remaining = useMemo(() => usernameCooldownRemaining(profile), [profile]);
   const canChangeUsername = remaining <= 0;
   const usernameDirty = normalizeUsername(username) !== profile.username;
 
@@ -61,24 +60,44 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
     }
   }
 
-  async function onAvatarPick(file?: File | null) {
+  function onAvatarPick(file?: File | null) {
     if (!file) return;
     setError("");
+    if (!file.type.startsWith("image/")) {
+      setError("Choose an image file.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError("Image must be under 8 MB before cropping.");
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setCropSrc(url);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  function closeCrop() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+  }
+
+  async function uploadCropped(blob: Blob) {
     setBusy(true);
     try {
       const fd = new FormData();
-      fd.set("avatar", file);
+      fd.set("avatar", new File([blob], "avatar.png", { type: "image/png" }));
       const res = await fetch("/api/profile/avatar", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
       setAvatarUrl(data.profile.avatar_url);
       toast("Profile picture updated 📸");
+      closeCrop();
       router.refresh();
     } catch (err) {
       setError((err as Error).message);
+      throw err;
     } finally {
       setBusy(false);
-      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
@@ -105,7 +124,10 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
         <div>
           <span className="eyebrow">Customize</span>
           <h2>Profile settings</h2>
-          <p>Update your look and handle — username can change once every {USERNAME_COOLDOWN_DAYS} days.</p>
+          <p>
+            Update your look and handle — username can change once every {USERNAME_COOLDOWN_DAYS}{" "}
+            days.
+          </p>
         </div>
       </div>
 
@@ -145,7 +167,7 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
               hidden
               onChange={(e) => onAvatarPick(e.target.files?.[0])}
             />
-            <div className="hint">JPG, PNG, WebP, or GIF · max 2 MB</div>
+            <div className="hint">Crop &amp; zoom after picking · saved as a circle</div>
           </div>
         </div>
 
@@ -196,6 +218,10 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
           </div>
         </form>
       </div>
+
+      {cropSrc ? (
+        <AvatarCropModal imageSrc={cropSrc} onCancel={closeCrop} onCropped={uploadCropped} />
+      ) : null}
     </div>
   );
 }

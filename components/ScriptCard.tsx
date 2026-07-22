@@ -46,7 +46,17 @@ export default function ScriptCard({
           </div>
         ) : null}
         <div className="meta">
-          <span className="who">@{s.author}</span>
+          <span className="who">
+            <span className="author-avatar">
+              {s.authorAvatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={s.authorAvatar} alt="" width={22} height={22} />
+              ) : (
+                <span aria-hidden>{(s.author[0] || "?").toUpperCase()}</span>
+              )}
+            </span>
+            @{s.author}
+          </span>
           <span>· {timeAgo(s.createdAt)}</span>
         </div>
         <div className="card-stats">

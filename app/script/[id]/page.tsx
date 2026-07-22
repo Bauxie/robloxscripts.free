@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getScript, incrementViews, publicView } from "@/lib/store";
 import { resolveRobloxGame } from "@/lib/roblox";
+import { withAuthorAvatars } from "@/lib/thumbnails";
 import { buildScriptMetadata, scriptJsonLd } from "@/lib/seo";
 import ScriptView from "@/components/ScriptView";
 
@@ -69,13 +70,15 @@ export default async function ScriptPage({ params }: PageProps) {
     playUrl: game?.playUrl,
   });
 
+  const [view] = await withAuthorAvatars([publicView(record, true)]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ScriptView s={publicView(record, true)} game={game} />
+      <ScriptView s={view} game={game} />
     </>
   );
 }
