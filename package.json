@@ -3,6 +3,9 @@
   "version": "2.0.0",
   "private": true,
   "description": "robloxscripts.free — a cartoon React + Next.js site for uploading and sharing Roblox scripts",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
