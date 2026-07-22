@@ -21,6 +21,7 @@ export type ScriptView = Omit<ScriptRecord, "code"> & {
   lines: number;
   size: number;
   code?: string;
+  thumbnailUrl?: string | null;
 };
 
 type ScriptRow = {

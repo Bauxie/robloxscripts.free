@@ -48,15 +48,34 @@ async function fetchJson<T>(url: string): Promise<T | null> {
 }
 
 export async function getPlaceThumbnail(placeId: string): Promise<string | null> {
-  const data = await fetchJson<{
-    data?: Array<{ imageUrl?: string; state?: string }>;
-  }>(
-    `https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${encodeURIComponent(
-      placeId
-    )}&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false`
-  );
-  const item = data?.data?.[0];
-  return item?.imageUrl || null;
+  const map = await getPlaceThumbnails([placeId]);
+  return map.get(placeId) || null;
+}
+
+/** Batch-fetch place thumbnails (cached ~1h via fetch revalidate). */
+export async function getPlaceThumbnails(placeIds: string[]): Promise<Map<string, string>> {
+  const unique = [...new Set(placeIds.map((id) => String(id || "").trim()).filter(Boolean))];
+  const out = new Map<string, string>();
+  const chunkSize = 50;
+
+  for (let i = 0; i < unique.length; i += chunkSize) {
+    const chunk = unique.slice(i, i + chunkSize);
+    const data = await fetchJson<{
+      data?: Array<{ targetId?: number | string; imageUrl?: string }>;
+    }>(
+      `https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${chunk
+        .map(encodeURIComponent)
+        .join(",")}&returnPolicy=PlaceHolder&size=512x512&format=Png&isCircular=false`
+    );
+
+    for (const item of data?.data || []) {
+      if (item?.imageUrl && item.targetId != null) {
+        out.set(String(item.targetId), item.imageUrl);
+      }
+    }
+  }
+
+  return out;
 }
 
 export async function getPlaceName(placeId: string): Promise<string | null> {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listScripts, publicView } from "@/lib/store";
+import { withThumbnails } from "@/lib/thumbnails";
 import { getSupabaseConfigError } from "@/lib/supabase";
 import BeachHero from "@/components/BeachHero";
 import ScriptCard from "@/components/ScriptCard";
@@ -24,17 +25,21 @@ export default async function HomePage() {
   const scriptCount = all.length;
   const viewCount = all.reduce((a, s) => a + (s.views || 0), 0);
 
-  const latest = [...all]
-    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-    .slice(0, 6)
-    .map((s) => publicView(s));
+  const latest = await withThumbnails(
+    [...all]
+      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+      .slice(0, 6)
+      .map((s) => publicView(s))
+  );
 
-  const trending = [...all]
-    .map((s) => ({ s, score: (s.views || 0) + (s.copies || 0) * 3 }))
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 6)
-    .map((x) => publicView(x.s));
+  const trending = await withThumbnails(
+    [...all]
+      .map((s) => ({ s, score: (s.views || 0) + (s.copies || 0) * 3 }))
+      .filter((x) => x.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6)
+      .map((x) => publicView(x.s))
+  );
 
   const gameCounts = new Map<string, number>();
   for (const s of all) {

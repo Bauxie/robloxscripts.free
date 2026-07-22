@@ -11,6 +11,7 @@ import {
 import { getSupabaseConfigError } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { parsePlaceId, getPlaceName } from "@/lib/roblox";
+import { withThumbnails } from "@/lib/thumbnails";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,7 +30,8 @@ export async function GET(req: NextRequest) {
     const q = (req.nextUrl.searchParams.get("q") || "").trim().toLowerCase();
     const sort = req.nextUrl.searchParams.get("sort") || "new";
     const scripts = await listScripts({ q, sort });
-    return NextResponse.json(scripts.map((s) => publicView(s)));
+    const views = await withThumbnails(scripts.map((s) => publicView(s)));
+    return NextResponse.json(views);
   } catch (e) {
     return fail(e);
   }
