@@ -506,28 +506,28 @@ a { color: inherit; text-decoration: none; }
   position: relative; display: flex; flex-direction: column;
   background: #fffef8;
   border: 3px solid var(--line); border-radius: var(--radius-blob);
-  padding: 20px; box-shadow: var(--shadow);
+  padding: 18px 18px 14px; box-shadow: var(--shadow);
   transition: transform .14s ease, box-shadow .14s ease; cursor: pointer; overflow: hidden;
+  min-height: 100%;
 }
 .card:hover {
   transform: translate(-3px, -3px) rotate(-0.6deg);
   box-shadow: 8px 8px 0 var(--line);
 }
 .card h3 {
-  font-size: 20px; margin: 0 0 8px; position: relative; line-height: 1.2;
+  font-size: 18px; margin: 0 0 8px; position: relative; line-height: 1.25;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .card-game {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   max-width: 100%;
+  width: fit-content;
   margin: 0 0 10px;
   font-size: 12px;
   font-weight: 800;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   background: #ffe0cf;
   color: #a33a00;
   padding: 4px 10px;
@@ -535,27 +535,57 @@ a { color: inherit; text-decoration: none; }
   border: 2px solid var(--line);
   box-shadow: 2px 2px 0 var(--line);
 }
+.card-game-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
 .card .desc {
-  color: var(--ink-soft); font-size: 14.5px; line-height: 1.5; position: relative;
+  color: var(--ink-soft); font-size: 14px; line-height: 1.45; position: relative;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  overflow: hidden; min-height: 42px; flex: 1; font-weight: 600;
+  overflow: hidden; min-height: 40px; flex: 1; font-weight: 600;
+  margin: 0;
 }
 .card .meta {
-  display: flex; align-items: center; gap: 10px; margin-top: 14px;
-  font-size: 13px; color: var(--ink-soft); position: relative; flex-wrap: wrap; font-weight: 700;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 12px; font-size: 13px; color: var(--ink-soft); position: relative; font-weight: 700;
 }
 .card .meta .who { font-weight: 800; color: var(--sea-deep); }
+.card .meta-time { white-space: nowrap; opacity: .9; }
 .card-stats {
-  display: flex; gap: 8px; margin-top: 14px; padding-top: 12px;
-  border-top: 3px dashed rgba(26,47,61,0.2); position: relative; flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 3px dashed rgba(26,47,61,0.2);
+  position: relative;
 }
 .card-stats span {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 12px; font-weight: 800; color: var(--ink);
-  background: #dff4ff; border: 2px solid var(--line);
-  border-radius: 999px; padding: 3px 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+  background: #dff4ff;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 8px;
 }
-.card-stats b { color: var(--ink); font-weight: 800; }
+.card-stats b { color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+.card .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; position: relative; }
+.card .tag {
+  font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
+  background: #e8fbff; color: #0a6a89; border: 2px solid var(--line);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; position: relative; }
 .tag {
   font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px;

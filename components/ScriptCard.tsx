@@ -2,6 +2,20 @@ import Link from "next/link";
 import type { ScriptView } from "@/lib/store";
 import { timeAgo } from "@/lib/format";
 
+function displayTags(s: ScriptView): string[] {
+  const game = (s.game || "").trim().toLowerCase();
+  const gameCompact = game.replace(/[^a-z0-9]+/g, "");
+  return (s.tags || [])
+    .filter((t) => {
+      const compact = t.replace(/[^a-z0-9]+/g, "");
+      if (!gameCompact) return true;
+      if (compact === gameCompact) return false;
+      if (compact.startsWith(gameCompact) && compact.endsWith("script")) return false;
+      return true;
+    })
+    .slice(0, 3);
+}
+
 export default function ScriptCard({
   s,
   hot = false,
@@ -9,6 +23,8 @@ export default function ScriptCard({
   s: ScriptView;
   hot?: boolean;
 }) {
+  const tags = displayTags(s);
+
   return (
     <Link
       href={`/script/${s.id}`}
@@ -18,14 +34,15 @@ export default function ScriptCard({
       <h3>{s.title}</h3>
       {s.game ? (
         <div className="card-game" title={s.game}>
-          🎮 {s.game}
+          <span>🎮</span>
+          <span className="card-game-name">{s.game}</span>
         </div>
       ) : null}
       <p className="desc">{s.description || "No description provided."}</p>
-      {s.tags?.length ? (
+      {tags.length ? (
         <div className="tags">
-          {s.tags.slice(0, 4).map((t) => (
-            <span className="tag" key={t}>
+          {tags.map((t) => (
+            <span className="tag" key={t} title={t}>
               #{t}
             </span>
           ))}
@@ -33,20 +50,20 @@ export default function ScriptCard({
       ) : null}
       <div className="meta">
         <span className="who">@{s.author}</span>
-        <span>· {timeAgo(s.createdAt)}</span>
+        <span className="meta-time">{timeAgo(s.createdAt)}</span>
       </div>
-      <div className="card-stats">
-        <span>
-          👁 <b>{s.views}</b> views
+      <div className="card-stats" aria-label="Stats">
+        <span title="Views">
+          <span aria-hidden>👁</span>
+          <b>{s.views}</b>
         </span>
-        <span>
-          ❤️ <b>{s.likes || 0}</b> likes
+        <span title="Likes">
+          <span aria-hidden>❤️</span>
+          <b>{s.likes || 0}</b>
         </span>
-        <span>
-          📋 <b>{s.copies || 0}</b> copies
-        </span>
-        <span>
-          <b>{s.lines}</b> lines
+        <span title="Copies">
+          <span aria-hidden>📋</span>
+          <b>{s.copies || 0}</b>
         </span>
       </div>
     </Link>
