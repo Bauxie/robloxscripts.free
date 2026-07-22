@@ -50,20 +50,17 @@ export default function ScriptCard({
       ) : null}
       <div className="meta">
         <span className="who">@{s.author}</span>
-        <span className="meta-time">{timeAgo(s.createdAt)}</span>
+        <span>· {timeAgo(s.createdAt)}</span>
       </div>
-      <div className="card-stats" aria-label="Stats">
-        <span title="Views">
-          <span aria-hidden>👁</span>
-          <b>{s.views}</b>
+      <div className="card-stats">
+        <span>
+          👁 <b>{s.views}</b> views
         </span>
-        <span title="Likes">
-          <span aria-hidden>❤️</span>
-          <b>{s.likes || 0}</b>
+        <span>
+          ❤️ <b>{s.likes || 0}</b> likes
         </span>
-        <span title="Copies">
-          <span aria-hidden>📋</span>
-          <b>{s.copies || 0}</b>
+        <span>
+          📋 <b>{s.copies || 0}</b> copies
         </span>
       </div>
     </Link>

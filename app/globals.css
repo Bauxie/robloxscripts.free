@@ -548,35 +548,21 @@ a { color: inherit; text-decoration: none; }
   margin: 0;
 }
 .card .meta {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  margin-top: 12px; font-size: 13px; color: var(--ink-soft); position: relative; font-weight: 700;
+  display: flex; align-items: center; gap: 10px; margin-top: 12px;
+  font-size: 13px; color: var(--ink-soft); position: relative; flex-wrap: wrap; font-weight: 700;
 }
 .card .meta .who { font-weight: 800; color: var(--sea-deep); }
-.card .meta-time { white-space: nowrap; opacity: .9; }
 .card-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 3px dashed rgba(26,47,61,0.2);
-  position: relative;
+  display: flex; gap: 8px; margin-top: 12px; padding-top: 12px;
+  border-top: 3px dashed rgba(26,47,61,0.2); position: relative; flex-wrap: wrap;
 }
 .card-stats span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-width: 0;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--ink);
-  background: #dff4ff;
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 8px;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 800; color: var(--ink);
+  background: #dff4ff; border: 2px solid var(--line);
+  border-radius: 999px; padding: 3px 9px;
 }
-.card-stats b { color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+.card-stats b { color: var(--ink); font-weight: 800; }
 .card .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; position: relative; }
 .card .tag {
   font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
