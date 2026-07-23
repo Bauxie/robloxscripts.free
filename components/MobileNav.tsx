@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Profile } from "@/lib/profile";
 import { canModerate } from "@/lib/roles";
-import DarkModeToggle from "@/components/DarkModeToggle";
 import LogoutButton from "@/components/LogoutButton";
 import RoleBadges from "@/components/RoleBadges";
 import NotificationsBell from "@/components/NotificationsBell";
@@ -32,7 +31,6 @@ export default function MobileNav({ profile }: { profile: Profile | null }) {
   return (
     <>
       <div className="nav-actions">
-        <DarkModeToggle />
         {profile ? <NotificationsBell /> : null}
         <button
           type="button"
@@ -55,9 +53,6 @@ export default function MobileNav({ profile }: { profile: Profile | null }) {
           if ((e.target as HTMLElement).closest("a,button")) close();
         }}
       >
-        <span className="nav-theme-desktop">
-          <DarkModeToggle />
-        </span>
         <Link href="/scripts">Scripts</Link>
         <Link href="/executors">Executors</Link>
         <a

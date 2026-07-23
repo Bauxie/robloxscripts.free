@@ -1797,11 +1797,6 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   line-height: 1.5;
 }
 
-.nav-theme-desktop {
-  display: inline-flex;
-  align-items: center;
-}
-
 /* Feature pack UI */
 .version-pill {
   display: inline-block;
@@ -1958,39 +1953,6 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   min-height: 64px;
 }
 
-/* Dark mode (optional) */
-html.theme-dark body {
-  --ink: #e8f4fa;
-  --ink-soft: #a9c2d0;
-  --cream: #102636;
-  --paper: #163246;
-  --line: #7eb6d4;
-  --sand: #3a4f5c;
-  --sand-dark: #2c3f4c;
-  background-color: #0b1a24;
-  background-image:
-    radial-gradient(circle at 12px 12px, rgba(126,182,212,0.12) 2px, transparent 3px),
-    linear-gradient(180deg, #0b1a24 0%, #123043 45%, #1a2f3d 100%);
-}
-html.theme-dark .nav,
-html.theme-dark .footer,
-html.theme-dark .panel,
-html.theme-dark .card,
-html.theme-dark .notif-dropdown,
-html.theme-dark .cookie-banner,
-html.theme-dark .compat-votes,
-html.theme-dark .sponsor-card {
-  background: #143044;
-  color: var(--ink);
-}
-html.theme-dark .search,
-html.theme-dark .select,
-html.theme-dark input,
-html.theme-dark textarea {
-  background: #0f2433;
-  color: var(--ink);
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
   .nav-actions { display: inline-flex; }
@@ -2038,7 +2000,6 @@ html.theme-dark textarea {
   }
   .nav-links .btn { justify-content: center; }
   .nav-bell-desktop { display: none; }
-  .nav-theme-desktop { display: none; }
   .brand-name { font-size: 15px; }
   .brand-mark { width: 36px; height: 36px; }
 }
