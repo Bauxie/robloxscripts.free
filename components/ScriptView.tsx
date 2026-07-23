@@ -10,7 +10,6 @@ import CommentsSection from "@/components/CommentsSection";
 import ReportButton from "@/components/ReportButton";
 import AdUnit from "@/components/AdUnit";
 import FavoriteButton from "@/components/FavoriteButton";
-import ShareButtons from "@/components/ShareButtons";
 import CompatVotes from "@/components/CompatVotes";
 import RecentlyViewed, { pushRecentScript } from "@/components/RecentlyViewed";
 import { EXECUTORS } from "@/lib/executors";
@@ -86,6 +85,15 @@ export default function ScriptView({
       fetch(`/api/scripts/${s.id}/copy`, { method: "POST" }).catch(() => {});
     } catch {
       toast("Copy failed — select manually", true);
+    }
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(`https://robloxscripts.free/script/${s.id}`);
+      toast("Link copied");
+    } catch {
+      toast("Couldn’t copy link", true);
     }
   }
 
@@ -237,6 +245,9 @@ export default function ScriptView({
             <a className="btn btn-ghost" href={`/api/scripts/${s.id}/raw`}>
               ⬇ Download .lua
             </a>
+            <button type="button" className="btn btn-ghost" onClick={copyLink}>
+              🔗 Copy link
+            </button>
             <FavoriteButton scriptId={s.id} canFavorite={canFavorite} />
             {canEdit ? (
               <>
@@ -279,11 +290,6 @@ export default function ScriptView({
             ) : null}
           </div>
         </div>
-
-        <ShareButtons
-          title={s.title}
-          url={`https://robloxscripts.free/script/${s.id}`}
-        />
 
         {s.description ? (
           <p style={{ color: "var(--ink-soft)", lineHeight: 1.6, maxWidth: "70ch" }}>

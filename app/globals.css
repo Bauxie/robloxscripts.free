@@ -1851,12 +1851,6 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   line-height: 1.45;
   max-width: 70ch;
 }
-.share-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0 8px;
-}
 .compat-votes {
   margin: 18px 0;
   padding: 14px 16px;
