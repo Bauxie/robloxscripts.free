@@ -1,6 +1,7 @@
 import { getAdminClient } from "@/lib/supabase/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { EXECUTORS } from "@/lib/executors";
+import { gameMatchesSlug, slugifyGame } from "@/lib/games";
 
 export type ScriptRecord = {
   id: string;
@@ -16,6 +17,14 @@ export type ScriptRecord = {
   copies: number;
   likes: number;
   createdAt: string;
+  updatedAt: string;
+  changelog: string;
+  version: number;
+  versionGroup: string;
+  featured: boolean;
+  staffVerified: boolean;
+  worksCount: number;
+  brokenCount: number;
   userId?: string | null;
 };
 
@@ -42,6 +51,14 @@ type ScriptRow = {
   copies: number | null;
   likes?: number | null;
   created_at: string;
+  updated_at?: string | null;
+  changelog?: string | null;
+  version?: number | null;
+  version_group?: string | null;
+  featured?: boolean | null;
+  staff_verified?: boolean | null;
+  works_count?: number | null;
+  broken_count?: number | null;
   user_id?: string | null;
 };
 
@@ -78,6 +95,14 @@ function fromRow(row: ScriptRow): ScriptRecord {
     copies: row.copies || 0,
     likes: row.likes || 0,
     createdAt: row.created_at,
+    updatedAt: row.updated_at || row.created_at,
+    changelog: row.changelog || "",
+    version: row.version || 1,
+    versionGroup: row.version_group || row.id,
+    featured: Boolean(row.featured),
+    staffVerified: Boolean(row.staff_verified),
+    worksCount: row.works_count || 0,
+    brokenCount: row.broken_count || 0,
     userId: row.user_id ?? null,
   };
 }
@@ -97,6 +122,14 @@ function toRow(s: ScriptRecord) {
     copies: s.copies,
     likes: s.likes,
     created_at: s.createdAt,
+    updated_at: s.updatedAt,
+    changelog: s.changelog,
+    version: s.version,
+    version_group: s.versionGroup || s.id,
+    featured: s.featured,
+    staff_verified: s.staffVerified,
+    works_count: s.worksCount,
+    broken_count: s.brokenCount,
     user_id: s.userId ?? null,
   };
 }
@@ -115,6 +148,14 @@ export function publicView(s: ScriptRecord, includeCode = false): ScriptView {
     copies: s.copies,
     likes: s.likes,
     createdAt: s.createdAt,
+    updatedAt: s.updatedAt,
+    changelog: s.changelog,
+    version: s.version,
+    versionGroup: s.versionGroup,
+    featured: s.featured,
+    staffVerified: s.staffVerified,
+    worksCount: s.worksCount,
+    brokenCount: s.brokenCount,
     userId: s.userId,
     lines: s.code ? s.code.split("\n").length : 0,
     size: s.code ? new TextEncoder().encode(s.code).length : 0,
@@ -147,10 +188,15 @@ export type ListScriptsOpts = {
   q?: string;
   sort?: string;
   userId?: string;
+  userIds?: string[];
   game?: string;
+  gameSlug?: string;
   tag?: string;
   executor?: string;
   verified?: boolean;
+  staffVerified?: boolean;
+  featured?: boolean;
+  ids?: string[];
 };
 
 function sortAndFilter(
@@ -162,8 +208,18 @@ function sortAndFilter(
   const q = (opts?.q || "").trim().toLowerCase();
   const sort = opts?.sort || "new";
   const game = (opts?.game || "").trim().toLowerCase();
+  const gameSlug = (opts?.gameSlug || "").trim().toLowerCase();
   const tag = (opts?.tag || "").trim().toLowerCase();
   const executor = (opts?.executor || "").trim().toLowerCase();
+
+  if (opts?.ids?.length) {
+    const set = new Set(opts.ids);
+    list = list.filter((s) => set.has(s.id));
+  }
+  if (opts?.userIds?.length) {
+    const set = new Set(opts.userIds);
+    list = list.filter((s) => s.userId && set.has(s.userId));
+  }
 
   if (q) {
     list = list.filter((s) => {
@@ -181,7 +237,9 @@ function sortAndFilter(
     });
   }
 
-  if (game) {
+  if (gameSlug) {
+    list = list.filter((s) => gameMatchesSlug(s.game, gameSlug));
+  } else if (game) {
     list = list.filter((s) => (s.game || "").toLowerCase().includes(game));
   }
   if (tag) {
@@ -193,11 +251,19 @@ function sortAndFilter(
   if (opts?.verified && verifiedUserIds) {
     list = list.filter((s) => s.userId && verifiedUserIds.has(s.userId));
   }
+  if (opts?.staffVerified) {
+    list = list.filter((s) => s.staffVerified);
+  }
+  if (opts?.featured) {
+    list = list.filter((s) => s.featured);
+  }
 
   if (sort === "popular") list.sort((a, b) => (b.views || 0) - (a.views || 0));
   else if (sort === "copies") list.sort((a, b) => (b.copies || 0) - (a.copies || 0));
   else if (sort === "likes") list.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-  else list.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  else if (sort === "updated") {
+    list.sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt));
+  } else list.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
   return list;
 }
@@ -222,6 +288,23 @@ export async function listScripts(opts?: ListScriptsOpts): Promise<ScriptRecord[
   return sortAndFilter(((data || []) as ScriptRow[]).map(fromRow), opts, verifiedUserIds);
 }
 
+export async function listGameSlugs(): Promise<{ slug: string; name: string; count: number }[]> {
+  const scripts = await listScripts({ sort: "new" });
+  const map = new Map<string, { name: string; count: number }>();
+  for (const s of scripts) {
+    const name = (s.game || "").trim();
+    if (!name) continue;
+    const slug = slugifyGame(name);
+    if (!slug) continue;
+    const cur = map.get(slug);
+    if (cur) cur.count += 1;
+    else map.set(slug, { name, count: 1 });
+  }
+  return [...map.entries()]
+    .map(([slug, v]) => ({ slug, name: v.name, count: v.count }))
+    .sort((a, b) => b.count - a.count);
+}
+
 export async function getScript(id: string): Promise<ScriptRecord | null> {
   const supabase = getAdminClient();
   const { data, error } = await supabase.from("scripts").select("*").eq("id", id).maybeSingle();
@@ -236,11 +319,30 @@ export async function createScriptWithClient(
   const row = toRow(record);
   const { data, error } = await client.from("scripts").insert(row).select("*").single();
   if (error) {
-    // Column may be missing until community.sql is applied
-    if (/executors/i.test(error.message)) {
-      const { executors: _drop, ...without } = row;
-      const retry = await client.from("scripts").insert(without).select("*").single();
-      if (retry.error) throw new Error(retry.error.message);
+    if (/executors|updated_at|changelog|version|featured|staff_verified|works_count/i.test(error.message)) {
+      const fallback = {
+        id: row.id,
+        title: row.title,
+        description: row.description,
+        author: row.author,
+        game: row.game,
+        game_place_id: row.game_place_id,
+        tags: row.tags,
+        executors: row.executors,
+        code: row.code,
+        views: row.views,
+        copies: row.copies,
+        likes: row.likes,
+        created_at: row.created_at,
+        user_id: row.user_id,
+      };
+      const retry = await client.from("scripts").insert(fallback).select("*").single();
+      if (retry.error) {
+        const { executors: _e, ...withoutEx } = fallback;
+        const retry2 = await client.from("scripts").insert(withoutEx).select("*").single();
+        if (retry2.error) throw new Error(retry2.error.message);
+        return fromRow(retry2.data as ScriptRow);
+      }
       return fromRow(retry.data as ScriptRow);
     }
     throw new Error(error.message);
@@ -251,9 +353,11 @@ export async function createScriptWithClient(
 export async function updateScriptWithClient(
   client: SupabaseClient,
   id: string,
-  patch: Partial<ScriptRecord>
+  patch: Partial<ScriptRecord> & { bumpVersion?: boolean }
 ): Promise<ScriptRecord> {
-  const updates: Record<string, unknown> = {};
+  const updates: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+  };
   if (patch.title != null) updates.title = patch.title;
   if (patch.description != null) updates.description = patch.description;
   if (patch.game != null) updates.game = patch.game;
@@ -261,6 +365,8 @@ export async function updateScriptWithClient(
   if (patch.tags != null) updates.tags = patch.tags;
   if (patch.executors != null) updates.executors = patch.executors;
   if (patch.code != null) updates.code = patch.code;
+  if (patch.changelog != null) updates.changelog = patch.changelog;
+  if (patch.version != null) updates.version = patch.version;
 
   const { data, error } = await client
     .from("scripts")
@@ -269,14 +375,16 @@ export async function updateScriptWithClient(
     .select("*")
     .single();
   if (error) {
-    if (/executors/i.test(error.message) && updates.executors != null) {
-      const { executors: _drop, ...without } = updates;
-      const retry = await client
-        .from("scripts")
-        .update(without)
-        .eq("id", id)
-        .select("*")
-        .single();
+    if (/executors|updated_at|changelog|version/i.test(error.message)) {
+      const soft: Record<string, unknown> = {};
+      if (patch.title != null) soft.title = patch.title;
+      if (patch.description != null) soft.description = patch.description;
+      if (patch.game != null) soft.game = patch.game;
+      if (patch.gamePlaceId !== undefined) soft.game_place_id = patch.gamePlaceId;
+      if (patch.tags != null) soft.tags = patch.tags;
+      if (patch.executors != null) soft.executors = patch.executors;
+      if (patch.code != null) soft.code = patch.code;
+      const retry = await client.from("scripts").update(soft).eq("id", id).select("*").single();
       if (retry.error) throw new Error(retry.error.message);
       return fromRow(retry.data as ScriptRow);
     }
@@ -349,4 +457,21 @@ export async function getProfileByUsername(username: string) {
     .maybeSingle();
   if (error) throw new Error(error.message);
   return data;
+}
+
+export async function setScriptStaffFlags(
+  id: string,
+  flags: { featured?: boolean; staffVerified?: boolean }
+) {
+  const updates: Record<string, unknown> = {};
+  if (flags.featured != null) updates.featured = flags.featured;
+  if (flags.staffVerified != null) updates.staff_verified = flags.staffVerified;
+  const { data, error } = await getAdminClient()
+    .from("scripts")
+    .update(updates)
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return fromRow(data as ScriptRow);
 }

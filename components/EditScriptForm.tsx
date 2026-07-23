@@ -17,6 +17,8 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
   const [code, setCode] = useState(script.code || "");
   const [tags, setTags] = useState((script.tags || []).join(","));
   const [executors, setExecutors] = useState(script.executors || []);
+  const [changelog, setChangelog] = useState("");
+  const [newVersion, setNewVersion] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,11 +37,17 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
           code,
           tags,
           executors,
+          changelog,
+          newVersion,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
-      toast("Script updated");
+      if (data.warnings?.length) {
+        toast(`Saved with warnings: ${data.warnings.join("; ")}`);
+      } else {
+        toast(newVersion ? `Published v${data.version}` : "Script updated");
+      }
       router.push(`/script/${script.id}`);
       router.refresh();
     } catch (err) {
@@ -69,7 +77,9 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
       <div className="section-head" style={{ marginTop: 0 }}>
         <div>
           <h2>✏️ Edit script</h2>
-          <p>Update your upload or delete it.</p>
+          <p>
+            Current version <b>v{script.version || 1}</b> — publish a new version to bump it.
+          </p>
         </div>
       </div>
       <form className="form-grid" onSubmit={onSave}>
@@ -100,6 +110,24 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
           />
         </div>
         <div>
+          <label>Changelog</label>
+          <textarea
+            value={changelog}
+            onChange={(e) => setChangelog(e.target.value)}
+            maxLength={2000}
+            rows={3}
+            placeholder="What changed in this update?"
+          />
+        </div>
+        <label className="filter-check">
+          <input
+            type="checkbox"
+            checked={newVersion}
+            onChange={(e) => setNewVersion(e.target.checked)}
+          />
+          Publish as new version (v{(script.version || 1) + 1})
+        </label>
+        <div>
           <label>Code</label>
           <textarea
             className="code-input"
@@ -115,7 +143,7 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
             Delete
           </button>
           <button type="submit" className="btn btn-primary" disabled={busy}>
-            {busy ? "Saving…" : "Save changes"}
+            {busy ? "Saving…" : newVersion ? "Publish new version" : "Save changes"}
           </button>
         </div>
       </form>

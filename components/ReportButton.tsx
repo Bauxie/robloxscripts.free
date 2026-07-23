@@ -7,14 +7,16 @@ export default function ReportButton({
   targetType,
   targetId,
   label = "Report",
+  defaultReason = "spam",
 }: {
   targetType: "script" | "user" | "comment";
   targetId: string;
   label?: string;
+  defaultReason?: string;
 }) {
   const toast = useToast();
   const [open, setOpen] = useState(false);
-  const [reason, setReason] = useState("spam");
+  const [reason, setReason] = useState(defaultReason);
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -60,6 +62,7 @@ export default function ReportButton({
                 <select className="select" value={reason} onChange={(e) => setReason(e.target.value)}>
                   <option value="spam">Spam</option>
                   <option value="malware">Malware / steal</option>
+                  <option value="broken">Broken / not working</option>
                   <option value="harassment">Harassment</option>
                   <option value="stolen">Stolen script</option>
                   <option value="other">Other</option>

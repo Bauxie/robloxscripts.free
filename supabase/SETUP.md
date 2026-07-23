@@ -7,7 +7,8 @@
 -- 2d. Run profile_settings.sql (username cooldown, bio, avatars bucket)
 -- 2e. Run roles.sql (profile roles / badges)
 -- 2f. Run community.sql (executors, comments, reports, notifications, edit/delete RLS)
--- 2g. Run security.sql (lock roles/counters + unique likes)  ← important
+-- 2g. Run security.sql (lock roles/counters + unique likes)
+-- 2h. Run features.sql (games pages meta, favorites, follows, votes, DMCA, sponsors…)
 -- 3. Supabase Dashboard → Authentication → URL Configuration
 --      Site URL: https://robloxscripts.free
 --      Redirect URLs include:

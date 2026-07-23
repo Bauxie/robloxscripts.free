@@ -12,6 +12,8 @@ import {
 import { getSupabaseConfigError } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { parsePlaceId, getPlaceName } from "@/lib/roblox";
+import { rateLimit } from "@/lib/rateLimit";
+import { scanScriptCode } from "@/lib/scan";
 import { enrichScriptViews } from "@/lib/thumbnails";
 
 export const runtime = "nodejs";
@@ -34,7 +36,18 @@ export async function GET(req: NextRequest) {
     const tag = req.nextUrl.searchParams.get("tag") || "";
     const executor = req.nextUrl.searchParams.get("executor") || "";
     const verified = req.nextUrl.searchParams.get("verified") === "1";
-    const scripts = await listScripts({ q, sort, game, tag, executor, verified });
+    const staffVerified = req.nextUrl.searchParams.get("staffVerified") === "1";
+    const featured = req.nextUrl.searchParams.get("featured") === "1";
+    const scripts = await listScripts({
+      q,
+      sort,
+      game,
+      tag,
+      executor,
+      verified,
+      staffVerified,
+      featured,
+    });
     const views = await enrichScriptViews(scripts.map((s) => publicView(s)));
     return NextResponse.json(views);
   } catch (e) {
@@ -53,6 +66,13 @@ export async function POST(req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return fail("You must be logged in to upload.", 401);
+
+    const rl = await rateLimit({
+      key: `upload:${user.id}`,
+      limit: 8,
+      windowSeconds: 3600,
+    });
+    if (!rl.ok) return fail("Upload rate limit — try again later.", 429);
 
     const { data: profile } = await supabase
       .from("profiles")
@@ -120,8 +140,11 @@ export async function POST(req: NextRequest) {
     if (!code.trim()) return fail("Script code is required.", 400);
     if (code.length > MAX_CODE) return fail("Script is too large (max 500 KB).", 400);
 
+    const scanHits = scanScriptCode(code);
+    const now = new Date().toISOString();
+    const id = nanoid(10);
     const record: ScriptRecord = {
-      id: nanoid(10),
+      id,
       title: title.slice(0, 120),
       description,
       author: author.slice(0, 60),
@@ -133,12 +156,23 @@ export async function POST(req: NextRequest) {
       views: 0,
       copies: 0,
       likes: 0,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
+      changelog: "Initial release",
+      version: 1,
+      versionGroup: id,
+      featured: false,
+      staffVerified: false,
+      worksCount: 0,
+      brokenCount: 0,
       userId: user.id,
     };
 
     const saved = await createScriptWithClient(supabase, record);
-    return NextResponse.json(publicView(saved, true), { status: 201 });
+    return NextResponse.json(
+      { ...publicView(saved, true), warnings: scanHits.map((h) => h.label) },
+      { status: 201 }
+    );
   } catch (e) {
     return fail(e);
   }

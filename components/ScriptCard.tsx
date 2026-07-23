@@ -6,6 +6,7 @@ import { timeAgo } from "@/lib/format";
 import RoleBadges from "@/components/RoleBadges";
 import { EXECUTORS } from "@/lib/executors";
 import ScriptManageButtons from "@/components/ScriptManageButtons";
+import { gameHref } from "@/lib/games";
 
 export default function ScriptCard({
   s,
@@ -25,7 +26,9 @@ export default function ScriptCard({
 
   return (
     <article
-      className={`card${hot ? " card-hot" : ""}${s.thumbnailUrl ? " card-has-media" : ""}`}
+      className={`card${hot ? " card-hot" : ""}${s.thumbnailUrl ? " card-has-media" : ""}${
+        s.featured ? " card-featured" : ""
+      }`}
     >
       <Link href={`/script/${s.id}`} className="card-media" style={{ color: "inherit" }}>
         {s.thumbnailUrl ? (
@@ -45,9 +48,29 @@ export default function ScriptCard({
 
       <div className="card-body">
         <Link href={`/script/${s.id}`} style={{ color: "inherit", textDecoration: "none" }}>
-          <h3>{s.title}</h3>
+          <h3>
+            {s.title}{" "}
+            {s.staffVerified ? (
+              <span className="badge-verified-script" title="Staff verified">
+                ✓
+              </span>
+            ) : null}
+          </h3>
           <p className="desc">{s.description || "No description provided."}</p>
         </Link>
+        {(s.featured || s.staffVerified) && (
+          <div className="script-badges">
+            {s.featured ? <span className="badge-featured">★ Featured</span> : null}
+            {s.staffVerified ? (
+              <span className="badge-verified-script">Staff verified</span>
+            ) : null}
+          </div>
+        )}
+        {s.game ? (
+          <Link href={gameHref(s.game)} className="card-game-link">
+            More {s.game} scripts →
+          </Link>
+        ) : null}
         {showTags && s.tags?.length ? (
           <div className="tags">
             {s.tags.slice(0, 3).map((t) => (
@@ -79,7 +102,7 @@ export default function ScriptCard({
             @{s.author}
             <RoleBadges roles={s.authorRoles} size="sm" />
           </Link>
-          <span>· {timeAgo(s.createdAt)}</span>
+          <span>· {timeAgo(s.updatedAt || s.createdAt)}</span>
         </div>
         <div className="card-stats">
           <span>

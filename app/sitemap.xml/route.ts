@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { listScripts } from "@/lib/store";
 import { getAdminClient } from "@/lib/supabase/admin";
+import { slugifyGame } from "@/lib/games";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,16 +42,30 @@ export async function GET() {
     urlEntry(`${SITE}/contact`, { changefreq: "monthly", priority: "0.4" }),
     urlEntry(`${SITE}/privacy`, { changefreq: "monthly", priority: "0.3" }),
     urlEntry(`${SITE}/terms`, { changefreq: "monthly", priority: "0.3" }),
+    urlEntry(`${SITE}/dmca`, { changefreq: "monthly", priority: "0.3" }),
   ];
 
   try {
     const scripts = await listScripts({ sort: "new" });
+    const games = new Set<string>();
+
     for (const s of scripts.slice(0, 5000)) {
       urls.push(
         urlEntry(`${SITE}/script/${s.id}`, {
-          lastmod: new Date(s.createdAt).toISOString(),
+          lastmod: new Date(s.updatedAt || s.createdAt).toISOString(),
           changefreq: "daily",
           priority: "0.8",
+        })
+      );
+      const slug = slugifyGame(s.game);
+      if (slug) games.add(slug);
+    }
+
+    for (const slug of games) {
+      urls.push(
+        urlEntry(`${SITE}/game/${encodeURIComponent(slug)}`, {
+          changefreq: "daily",
+          priority: "0.75",
         })
       );
     }

@@ -4,6 +4,7 @@ import { getAdminClient } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getScript } from "@/lib/store";
 import { createNotification } from "@/lib/notifications";
+import { rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,6 +62,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return fail("Login required.", 401);
+
+    const rl = await rateLimit({
+      key: `comment:${user.id}`,
+      limit: 20,
+      windowSeconds: 3600,
+    });
+    if (!rl.ok) return fail("Comment rate limit — try later.", 429);
 
     const script = await getScript(params.id);
     if (!script) return fail("Script not found", 404);

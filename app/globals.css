@@ -1797,6 +1797,200 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   line-height: 1.5;
 }
 
+.nav-theme-desktop {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Feature pack UI */
+.version-pill {
+  display: inline-block;
+  font-size: 0.45em;
+  vertical-align: middle;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #dff4ff;
+  border: 2px solid var(--line);
+  color: var(--sea-deep);
+  font-weight: 800;
+}
+.script-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.badge-verified-script,
+.badge-featured {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+}
+.badge-verified-script {
+  background: #e8fff0;
+  color: #0a7a3e;
+}
+.badge-featured {
+  background: #fff3c4;
+  color: #7a5200;
+}
+.card-featured {
+  outline: 3px solid #ffd166;
+}
+.card-game-link {
+  display: inline-block;
+  margin: 6px 0 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sea-deep);
+}
+.changelog-line {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+  line-height: 1.45;
+  max-width: 70ch;
+}
+.share-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+.compat-votes {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 3px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fffef8;
+}
+.compat-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.compat-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.recent-viewed {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 2px dashed rgba(26, 47, 61, 0.15);
+}
+.recent-viewed h3 {
+  font-family: "Fredoka", sans-serif;
+  margin-bottom: 8px;
+}
+.recent-viewed ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.recent-viewed a {
+  font-weight: 800;
+  color: var(--sea-deep);
+}
+.upload-tips {
+  margin: 12px 0 0;
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+  font-weight: 700;
+  line-height: 1.5;
+  display: grid;
+  gap: 4px;
+}
+.sponsor-row {
+  margin: 0 0 20px;
+}
+.sponsor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+.sponsor-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 3px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fffef8;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-sm);
+}
+.sponsor-card img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid var(--line);
+}
+.sponsor-card strong {
+  display: block;
+  font-family: "Fredoka", sans-serif;
+}
+.sponsor-card span {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.mod-staff-notes {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+.mod-staff-notes textarea {
+  width: 100%;
+  min-height: 64px;
+}
+
+/* Dark mode (optional) */
+html.theme-dark body {
+  --ink: #e8f4fa;
+  --ink-soft: #a9c2d0;
+  --cream: #102636;
+  --paper: #163246;
+  --line: #7eb6d4;
+  --sand: #3a4f5c;
+  --sand-dark: #2c3f4c;
+  background-color: #0b1a24;
+  background-image:
+    radial-gradient(circle at 12px 12px, rgba(126,182,212,0.12) 2px, transparent 3px),
+    linear-gradient(180deg, #0b1a24 0%, #123043 45%, #1a2f3d 100%);
+}
+html.theme-dark .nav,
+html.theme-dark .footer,
+html.theme-dark .panel,
+html.theme-dark .card,
+html.theme-dark .notif-dropdown,
+html.theme-dark .cookie-banner,
+html.theme-dark .compat-votes,
+html.theme-dark .sponsor-card {
+  background: #143044;
+  color: var(--ink);
+}
+html.theme-dark .search,
+html.theme-dark .select,
+html.theme-dark input,
+html.theme-dark textarea {
+  background: #0f2433;
+  color: var(--ink);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
   .nav-actions { display: inline-flex; }
@@ -1844,6 +2038,7 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   }
   .nav-links .btn { justify-content: center; }
   .nav-bell-desktop { display: none; }
+  .nav-theme-desktop { display: none; }
   .brand-name { font-size: 15px; }
   .brand-mark { width: 36px; height: 36px; }
 }

@@ -10,6 +10,7 @@ import { enrichScriptViews } from "@/lib/thumbnails";
 import { normalizeRoles } from "@/lib/roles";
 import ScriptCard from "@/components/ScriptCard";
 import RoleBadges from "@/components/RoleBadges";
+import FollowButton from "@/components/FollowButton";
 import ReportButton from "@/components/ReportButton";
 import { getCurrentProfile } from "@/lib/auth";
 
@@ -39,6 +40,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const likes = scripts.reduce((a, s) => a + (s.likes || 0), 0);
   const roles = normalizeRoles(profile.roles);
   const isSelf = me?.id === profile.id;
+  const canFollow = Boolean(me && !isSelf);
 
   return (
     <main className="app">
@@ -76,7 +78,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 Edit profile
               </Link>
             ) : (
-              <ReportButton targetType="user" targetId={profile.id as string} label="Report user" />
+              <>
+                <FollowButton userId={profile.id as string} canFollow={canFollow} />
+                <ReportButton targetType="user" targetId={profile.id as string} label="Report user" />
+              </>
             )}
           </div>
         </div>

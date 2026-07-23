@@ -5,6 +5,7 @@ import { resolveRobloxGame } from "@/lib/roblox";
 import { withAuthorAvatars } from "@/lib/thumbnails";
 import { buildScriptMetadata, scriptJsonLd } from "@/lib/seo";
 import { getCurrentProfile } from "@/lib/auth";
+import { canModerate } from "@/lib/roles";
 import ScriptView from "@/components/ScriptView";
 
 export const dynamic = "force-dynamic";
@@ -76,6 +77,9 @@ export default async function ScriptPage({ params }: PageProps) {
   const canEdit = Boolean(me && record.userId && me.id === record.userId);
   const canComment = Boolean(me);
   const canReport = Boolean(me && (!record.userId || me.id !== record.userId));
+  const canFavorite = Boolean(me);
+  const canVote = Boolean(me);
+  const canModerateScript = Boolean(me && canModerate(me.roles));
 
   return (
     <>
@@ -91,6 +95,9 @@ export default async function ScriptPage({ params }: PageProps) {
         canEdit={canEdit}
         canComment={canComment}
         canReport={canReport}
+        canFavorite={canFavorite}
+        canVote={canVote}
+        canModerateScript={canModerateScript}
       />
     </>
   );

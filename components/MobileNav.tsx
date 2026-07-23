@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Profile } from "@/lib/profile";
 import { canModerate } from "@/lib/roles";
+import DarkModeToggle from "@/components/DarkModeToggle";
 import LogoutButton from "@/components/LogoutButton";
 import RoleBadges from "@/components/RoleBadges";
 import NotificationsBell from "@/components/NotificationsBell";
@@ -31,6 +32,7 @@ export default function MobileNav({ profile }: { profile: Profile | null }) {
   return (
     <>
       <div className="nav-actions">
+        <DarkModeToggle />
         {profile ? <NotificationsBell /> : null}
         <button
           type="button"
@@ -53,6 +55,9 @@ export default function MobileNav({ profile }: { profile: Profile | null }) {
           if ((e.target as HTMLElement).closest("a,button")) close();
         }}
       >
+        <span className="nav-theme-desktop">
+          <DarkModeToggle />
+        </span>
         <Link href="/scripts">Scripts</Link>
         <Link href="/executors">Executors</Link>
         <a
@@ -63,6 +68,12 @@ export default function MobileNav({ profile }: { profile: Profile | null }) {
         >
           Discord
         </a>
+        {profile ? (
+          <>
+            <Link href="/favorites">Favorites</Link>
+            <Link href="/feed">Feed</Link>
+          </>
+        ) : null}
         {profile ? (
           <>
             {canModerate(profile.roles) ? <Link href="/admin">Admin</Link> : null}

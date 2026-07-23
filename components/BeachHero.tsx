@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { gameHref } from "@/lib/games";
 
 // fading glowing dots scattered over the water
 const SPARKLES = [
@@ -200,7 +201,7 @@ export default function BeachHero({
             {topGames.map((g) => (
               <Link
                 key={g.name}
-                href={`/scripts?q=${encodeURIComponent(g.name)}`}
+                href={gameHref(g.name)}
                 className="chip"
               >
                 🎮 {g.name}

@@ -12,6 +12,8 @@ Disallow: /login
 Disallow: /signup
 Disallow: /upload
 Disallow: /notifications
+Disallow: /favorites
+Disallow: /feed
 
 Sitemap: https://robloxscripts.free/sitemap.xml
 `;

@@ -5,6 +5,7 @@ import { getAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/lib/auth";
 import { canModerate } from "@/lib/roles";
 import { createNotification } from "@/lib/notifications";
+import { rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -78,6 +79,13 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
     if (!user) return fail("Login required.", 401);
 
+    const rl = await rateLimit({
+      key: `report:${user.id}`,
+      limit: 10,
+      windowSeconds: 3600,
+    });
+    if (!rl.ok) return fail("Too many reports — try later.", 429);
+
     const body = await req.json();
     const targetType = String(body.targetType || "");
     const targetId = String(body.targetId || "").trim();
@@ -113,25 +121,33 @@ export async function PATCH(req: NextRequest) {
 
     const body = await req.json();
     const id = String(body.id || "");
-    const status = String(body.status || "");
-    if (!id || !["resolved", "dismissed", "open"].includes(status)) {
-      return fail("Invalid update.", 400);
+    const status = body.status != null ? String(body.status) : null;
+    const staffNotes =
+      body.staffNotes != null ? String(body.staffNotes).trim().slice(0, 2000) : null;
+
+    if (!id) return fail("Invalid update.", 400);
+    if (status && !["resolved", "dismissed", "open"].includes(status)) {
+      return fail("Invalid status.", 400);
     }
+
+    const updates: Record<string, unknown> = {};
+    if (status) {
+      updates.status = status;
+      updates.resolved_at = status === "open" ? null : new Date().toISOString();
+      updates.resolved_by = status === "open" ? null : profile.id;
+    }
+    if (staffNotes != null) updates.staff_notes = staffNotes;
 
     const admin = getAdminClient();
     const { data, error } = await admin
       .from("reports")
-      .update({
-        status,
-        resolved_at: status === "open" ? null : new Date().toISOString(),
-        resolved_by: status === "open" ? null : profile.id,
-      })
+      .update(updates)
       .eq("id", id)
       .select("*")
       .single();
     if (error) return fail(error.message);
 
-    if (data?.reporter_id) {
+    if (status && data?.reporter_id) {
       await createNotification({
         userId: data.reporter_id as string,
         kind: "report",

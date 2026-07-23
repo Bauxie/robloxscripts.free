@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EXECUTORS } from "@/lib/executors";
+import SponsorSlots from "@/components/SponsorSlots";
 
 export const metadata = {
   title: "Executors — robloxscripts.free",
@@ -29,6 +30,8 @@ export default function ExecutorsPage() {
           Browse scripts →
         </Link>
       </div>
+
+      <SponsorSlots placement="executors" />
 
       <div className="exec-note panel">
         <b>Heads up:</b> Status badges change often after Roblox updates. Always download from the

@@ -15,6 +15,7 @@ export default function ScriptsClient() {
   const initialTag = searchParams.get("tag") || "";
   const initialExecutor = searchParams.get("executor") || "";
   const initialVerified = searchParams.get("verified") === "1";
+  const initialStaffVerified = searchParams.get("staffVerified") === "1";
 
   const [q, setQ] = useState(initialQ);
   const [sort, setSort] = useState(initialSort);
@@ -22,6 +23,7 @@ export default function ScriptsClient() {
   const [tag, setTag] = useState(initialTag);
   const [executor, setExecutor] = useState(initialExecutor);
   const [verified, setVerified] = useState(initialVerified);
+  const [staffVerified, setStaffVerified] = useState(initialStaffVerified);
   const [scripts, setScripts] = useState<ScriptView[] | null>(null);
   const [error, setError] = useState("");
   const deb = useRef<ReturnType<typeof setTimeout>>();
@@ -33,6 +35,7 @@ export default function ScriptsClient() {
     tagF: string;
     executorF: string;
     verifiedF: boolean;
+    staffVerifiedF: boolean;
   }) {
     setError("");
     try {
@@ -43,6 +46,7 @@ export default function ScriptsClient() {
       if (opts.tagF) params.set("tag", opts.tagF);
       if (opts.executorF) params.set("executor", opts.executorF);
       if (opts.verifiedF) params.set("verified", "1");
+      if (opts.staffVerifiedF) params.set("staffVerified", "1");
       const res = await fetch("/api/scripts?" + params.toString());
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load");
@@ -54,24 +58,44 @@ export default function ScriptsClient() {
   }
 
   useEffect(() => {
+    let prefExecutor = initialExecutor;
+    if (!prefExecutor) {
+      try {
+        prefExecutor = localStorage.getItem("rs_executor_pref") || "";
+      } catch {
+        prefExecutor = "";
+      }
+    }
     setQ(initialQ);
     setSort(initialSort);
     setGame(initialGame);
     setTag(initialTag);
-    setExecutor(initialExecutor);
+    setExecutor(prefExecutor);
     setVerified(initialVerified);
+    setStaffVerified(initialStaffVerified);
     load({
       query: initialQ,
       sortBy: initialSort,
       gameF: initialGame,
       tagF: initialTag,
-      executorF: initialExecutor,
+      executorF: prefExecutor,
       verifiedF: initialVerified,
+      staffVerifiedF: initialStaffVerified,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialQ, initialSort, initialGame, initialTag, initialExecutor, initialVerified]);
+  }, [initialQ, initialSort, initialGame, initialTag, initialExecutor, initialVerified, initialStaffVerified]);
 
-  function reload(next?: Partial<{ q: string; sort: string; game: string; tag: string; executor: string; verified: boolean }>) {
+  function reload(
+    next?: Partial<{
+      q: string;
+      sort: string;
+      game: string;
+      tag: string;
+      executor: string;
+      verified: boolean;
+      staffVerified: boolean;
+    }>
+  ) {
     const opts = {
       query: next?.q ?? q,
       sortBy: next?.sort ?? sort,
@@ -79,6 +103,7 @@ export default function ScriptsClient() {
       tagF: next?.tag ?? tag,
       executorF: next?.executor ?? executor,
       verifiedF: next?.verified ?? verified,
+      staffVerifiedF: next?.staffVerified ?? staffVerified,
     };
     load(opts);
   }
@@ -127,6 +152,7 @@ export default function ScriptsClient() {
           <option value="new">Newest</option>
           <option value="popular">Most viewed</option>
           <option value="likes">Most liked</option>
+          <option value="updated">Recently updated</option>
           <option value="copies">Most copied</option>
         </select>
       </div>
@@ -157,6 +183,11 @@ export default function ScriptsClient() {
           value={executor}
           onChange={(e) => {
             setExecutor(e.target.value);
+            try {
+              if (e.target.value) localStorage.setItem("rs_executor_pref", e.target.value);
+            } catch {
+              // ignore
+            }
             reload({ executor: e.target.value });
           }}
         >
@@ -176,7 +207,18 @@ export default function ScriptsClient() {
               reload({ verified: e.target.checked });
             }}
           />
-          Verified only
+          Verified creators
+        </label>
+        <label className="filter-check">
+          <input
+            type="checkbox"
+            checked={staffVerified}
+            onChange={(e) => {
+              setStaffVerified(e.target.checked);
+              reload({ staffVerified: e.target.checked });
+            }}
+          />
+          Staff-verified scripts
         </label>
       </div>
 

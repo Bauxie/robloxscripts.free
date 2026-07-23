@@ -9,7 +9,12 @@ import RoleBadges from "@/components/RoleBadges";
 import CommentsSection from "@/components/CommentsSection";
 import ReportButton from "@/components/ReportButton";
 import AdUnit from "@/components/AdUnit";
+import FavoriteButton from "@/components/FavoriteButton";
+import ShareButtons from "@/components/ShareButtons";
+import CompatVotes from "@/components/CompatVotes";
+import RecentlyViewed, { pushRecentScript } from "@/components/RecentlyViewed";
 import { EXECUTORS } from "@/lib/executors";
+import { gameHref } from "@/lib/games";
 
 type GamePreview = {
   placeId: string;
@@ -28,17 +33,25 @@ export default function ScriptView({
   canEdit = false,
   canComment = false,
   canReport = false,
+  canFavorite = false,
+  canVote = false,
+  canModerateScript = false,
 }: {
   s: ScriptViewType;
   game?: GamePreview | null;
   canEdit?: boolean;
   canComment?: boolean;
   canReport?: boolean;
+  canFavorite?: boolean;
+  canVote?: boolean;
+  canModerateScript?: boolean;
 }) {
   const toast = useToast();
   const html = useMemo(() => highlightLua(s.code || ""), [s.code]);
   const [likes, setLikes] = useState(s.likes || 0);
   const [liked, setLiked] = useState(false);
+  const [featured, setFeatured] = useState(s.featured);
+  const [staffVerified, setStaffVerified] = useState(s.staffVerified);
 
   useEffect(() => {
     try {
@@ -46,7 +59,25 @@ export default function ScriptView({
     } catch {
       setLiked(false);
     }
-  }, [s.id]);
+    pushRecentScript({ id: s.id, title: s.title });
+  }, [s.id, s.title]);
+
+  async function toggleStaff(flag: "featured" | "staffVerified", value: boolean) {
+    try {
+      const res = await fetch(`/api/scripts/${s.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [flag]: value }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      if (flag === "featured") setFeatured(value);
+      else setStaffVerified(value);
+      toast("Updated");
+    } catch (e) {
+      toast((e as Error).message, true);
+    }
+  }
 
   async function copy() {
     try {
@@ -126,7 +157,18 @@ export default function ScriptView({
       <div className="panel">
         <div className="detail-head">
           <div>
-            <h1>{s.title}</h1>
+            <h1>
+              {s.title}{" "}
+              <span className="version-pill">v{s.version || 1}</span>
+            </h1>
+            <div className="script-badges">
+              {staffVerified ? (
+                <span className="badge-verified-script" title="Staff reviewed">
+                  ✓ Staff verified
+                </span>
+              ) : null}
+              {featured ? <span className="badge-featured">★ Featured</span> : null}
+            </div>
             <div className="detail-sub detail-author">
               <span className="author-avatar author-avatar-md">
                 {s.authorAvatar ? (
@@ -142,15 +184,21 @@ export default function ScriptView({
               </Link>
               <RoleBadges roles={s.authorRoles} size="sm" />
               <span>· {timeAgo(s.createdAt)}</span>
+              {s.updatedAt && s.updatedAt !== s.createdAt ? (
+                <span>· updated {timeAgo(s.updatedAt)}</span>
+              ) : null}
               {s.game ? (
                 <>
                   {" · "}
-                  <Link href={`/scripts?q=${encodeURIComponent(s.game)}&game=${encodeURIComponent(s.game)}`}>
-                    🎮 {s.game}
-                  </Link>
+                  <Link href={gameHref(s.game)}>🎮 {s.game}</Link>
                 </>
               ) : null}
             </div>
+            {s.changelog ? (
+              <p className="changelog-line">
+                <b>Changelog:</b> {s.changelog}
+              </p>
+            ) : null}
             {s.tags?.length ? (
               <div className="tags">
                 {s.tags.map((t) => (
@@ -189,6 +237,7 @@ export default function ScriptView({
             <a className="btn btn-ghost" href={`/api/scripts/${s.id}/raw`}>
               ⬇ Download .lua
             </a>
+            <FavoriteButton scriptId={s.id} canFavorite={canFavorite} />
             {canEdit ? (
               <>
                 <Link href={`/script/${s.id}/edit`} className="btn btn-ghost">
@@ -200,10 +249,41 @@ export default function ScriptView({
               </>
             ) : null}
             {canReport ? (
-              <ReportButton targetType="script" targetId={s.id} label="Report" />
+              <>
+                <ReportButton targetType="script" targetId={s.id} label="Report" />
+                <ReportButton
+                  targetType="script"
+                  targetId={s.id}
+                  label="Report broken"
+                  defaultReason="broken"
+                />
+              </>
+            ) : null}
+            {canModerateScript ? (
+              <>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => toggleStaff("featured", !featured)}
+                >
+                  {featured ? "Unfeature" : "Feature"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => toggleStaff("staffVerified", !staffVerified)}
+                >
+                  {staffVerified ? "Unverify" : "Staff verify"}
+                </button>
+              </>
             ) : null}
           </div>
         </div>
+
+        <ShareButtons
+          title={s.title}
+          url={`https://robloxscripts.free/script/${s.id}`}
+        />
 
         {s.description ? (
           <p style={{ color: "var(--ink-soft)", lineHeight: 1.6, maxWidth: "70ch" }}>
@@ -284,7 +364,15 @@ export default function ScriptView({
           </pre>
         </div>
 
+        <CompatVotes
+          scriptId={s.id}
+          canVote={canVote}
+          initialWorks={s.worksCount}
+          initialBroken={s.brokenCount}
+        />
+
         <CommentsSection scriptId={s.id} canComment={canComment} />
+        <RecentlyViewed excludeId={s.id} />
       </div>
     </main>
   );

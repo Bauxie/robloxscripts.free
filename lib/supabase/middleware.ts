@@ -42,6 +42,8 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/profile") ||
     path.startsWith("/admin") ||
     path.startsWith("/notifications") ||
+    path.startsWith("/favorites") ||
+    path.startsWith("/feed") ||
     /^\/script\/[^/]+\/edit\/?$/.test(path);
 
   if (needsAuth && !user) {

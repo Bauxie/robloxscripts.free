@@ -47,7 +47,11 @@ export default function UploadPage({ username }: { username: string }) {
       const res = await fetch("/api/scripts", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
-      toast("Published! 🌊");
+      if (data.warnings?.length) {
+        toast(`Published with warnings: ${data.warnings.join("; ")}`);
+      } else {
+        toast("Published! 🌊");
+      }
       router.push(`/script/${data.id}`);
     } catch (err) {
       setError((err as Error).message);
@@ -74,6 +78,19 @@ export default function UploadPage({ username }: { username: string }) {
             <p>
               Publishing as <b>@{username}</b> · paste code or drop a <b>.lua</b> / <b>.txt</b> file.
             </p>
+            <ul className="upload-tips">
+              <li>Add a clear title and Roblox game link for SEO + Play Game.</li>
+              <li>Pick executor tags so people can filter what works.</li>
+              <li>Never upload stealers, webhooks, or account grabbers.</li>
+              <li>Describe keybinds / setup in the description.</li>
+              <li>
+                Discord perk: members of{" "}
+                <a href="https://discord.gg/TaX9wg9seD" target="_blank" rel="noopener noreferrer">
+                  our server
+                </a>{" "}
+                get faster staff review when requested.
+              </li>
+            </ul>
           </div>
         </div>
 

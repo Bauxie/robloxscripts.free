@@ -32,6 +32,7 @@ type Report = {
   target_href?: string | null;
   reason: string;
   details: string;
+  staff_notes?: string;
   status: string;
   created_at: string;
 };
@@ -302,6 +303,22 @@ export default function AdminPanel({
                       </div>
                     </div>
                     {r.details ? <p className="mod-report-details">{r.details}</p> : null}
+                    <div className="mod-staff-notes">
+                      <label className="hint">Staff notes</label>
+                      <textarea
+                        defaultValue={r.staff_notes || ""}
+                        rows={2}
+                        placeholder="Internal notes…"
+                        onBlur={async (e) => {
+                          const staffNotes = e.target.value;
+                          await fetch("/api/reports", {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id: r.id, staffNotes }),
+                          });
+                        }}
+                      />
+                    </div>
                   </div>
                 );
               })}

@@ -42,6 +42,14 @@ export default async function HomePage() {
       .map((x) => publicView(x.s))
   );
 
+  const featured = await enrichScriptViews(
+    [...all]
+      .filter((s) => s.featured)
+      .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt))
+      .slice(0, 6)
+      .map((s) => publicView(s))
+  );
+
   const gameCounts = new Map<string, number>();
   for (const s of all) {
     const g = (s.game || "").trim();
@@ -69,6 +77,23 @@ export default async function HomePage() {
                 redeploy.
               </p>
             </div>
+          ) : null}
+
+          {featured.length > 0 ? (
+            <>
+              <div className="section-head">
+                <div>
+                  <span className="eyebrow">Staff picks</span>
+                  <h2>★ Featured scripts</h2>
+                  <p>Hand-picked uploads worth trying first.</p>
+                </div>
+              </div>
+              <div className="grid">
+                {featured.map((s) => (
+                  <ScriptCard key={s.id} s={s} />
+                ))}
+              </div>
+            </>
           ) : null}
 
           {trending.length > 0 ? (
