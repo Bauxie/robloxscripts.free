@@ -56,10 +56,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
+        <AdSenseLoader />
       </head>
       <body>
         <GoogleAnalytics />
-        <AdSenseLoader />
         <ToastProvider>
           <Nav />
           {children}

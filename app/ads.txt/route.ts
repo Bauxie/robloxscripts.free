@@ -5,24 +5,18 @@ export const dynamic = "force-dynamic";
 
 /**
  * Google AdSense ads.txt
- * Set NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-XXXXXXXX (or ADSENSE_PUB_ID=pub-XXXXXXXX)
+ * Defaults to the site publisher ID; override with NEXT_PUBLIC_ADSENSE_CLIENT or ADSENSE_PUB_ID.
  */
 export async function GET() {
-  const client = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "").trim();
+  const client = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-9808155078584354").trim();
   const pub =
     (process.env.ADSENSE_PUB_ID || "").trim() ||
     (client.startsWith("ca-pub-") ? client.slice(3) : client.startsWith("pub-") ? client : "");
 
   const lines = [
     "# robloxscripts.free ads.txt",
-    "# Replace with your real publisher ID after AdSense approval.",
+    `google.com, ${pub || "pub-9808155078584354"}, DIRECT, f08c47fec0942fa0`,
   ];
-
-  if (pub) {
-    lines.push(`google.com, ${pub}, DIRECT, f08c47fec0942fa0`);
-  } else {
-    lines.push("# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0");
-  }
 
   return new NextResponse(lines.join("\n") + "\n", {
     headers: {

@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-/** Place an AdSense display unit. Requires NEXT_PUBLIC_ADSENSE_CLIENT + slot id. */
+/** Place an AdSense display unit. Requires a slot id (and the site-wide AdSense loader). */
 export default function AdUnit({
   slot,
   format = "auto",
@@ -20,7 +20,7 @@ export default function AdUnit({
   responsive?: boolean;
   className?: string;
 }) {
-  const client = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "").trim();
+  const client = (process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-9808155078584354").trim();
   const pushed = useRef(false);
 
   useEffect(() => {
