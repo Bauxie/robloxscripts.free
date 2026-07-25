@@ -6,6 +6,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import { canModerate } from "@/lib/roles";
 import { createNotification } from "@/lib/notifications";
 import { rateLimit } from "@/lib/rateLimit";
+import { profilePath } from "@/lib/profilePath";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -60,9 +61,7 @@ export async function GET(req: NextRequest) {
           r.target_type === "script"
             ? `/script/${r.target_id}`
             : r.target_type === "user"
-              ? `/u/${encodeURIComponent(
-                  usernameById.get(r.target_id as string) || r.target_id
-                )}`
+              ? profilePath(usernameById.get(r.target_id as string) || String(r.target_id))
               : null,
       })),
     });

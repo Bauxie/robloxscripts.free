@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { timeAgo } from "@/lib/format";
+import { profilePath } from "@/lib/profilePath";
 import { useToast } from "@/components/ToastProvider";
 
 type Comment = {
@@ -115,7 +116,7 @@ export default function CommentsSection({
                     <span aria-hidden>{(c.author[0] || "?").toUpperCase()}</span>
                   )}
                 </span>
-                <Link href={`/u/${encodeURIComponent(c.author)}`}>@{c.author}</Link>
+                <Link href={profilePath(c.author)}>@{c.author}</Link>
                 <span className="muted">· {timeAgo(c.createdAt)}</span>
               </div>
               <p>{c.body}</p>

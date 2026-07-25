@@ -7,6 +7,7 @@ import { canModerate } from "@/lib/roles";
 import LogoutButton from "@/components/LogoutButton";
 import RoleBadges from "@/components/RoleBadges";
 import NotificationsBell from "@/components/NotificationsBell";
+import { profilePath } from "@/lib/profilePath";
 
 export default function MobileNav({ profile }: { profile: Profile | null }) {
   const [open, setOpen] = useState(false);
@@ -75,7 +76,7 @@ export default function MobileNav({ profile }: { profile: Profile | null }) {
             <span className="nav-bell-desktop">
               <NotificationsBell />
             </span>
-            <Link href={`/u/${encodeURIComponent(profile.username)}`} className="nav-profile">
+            <Link href={profilePath(profile.username)} className="nav-profile">
               <span className="nav-avatar">
                 {profile.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element

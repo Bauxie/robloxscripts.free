@@ -459,6 +459,79 @@ export async function getProfileByUsername(username: string) {
   return data;
 }
 
+export async function getFollowCounts(userId: string): Promise<{
+  followers: number;
+  following: number;
+}> {
+  const admin = getAdminClient();
+  const [followers, following] = await Promise.all([
+    admin
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("following_id", userId),
+    admin
+      .from("follows")
+      .select("*", { count: "exact", head: true })
+      .eq("follower_id", userId),
+  ]);
+  return {
+    followers: followers.count || 0,
+    following: following.count || 0,
+  };
+}
+
+export type ProfileCommentActivity = {
+  id: string;
+  body: string;
+  createdAt: string;
+  scriptId: string;
+  scriptTitle: string;
+  scriptGame: string;
+};
+
+export async function listUserComments(
+  userId: string,
+  limit = 40
+): Promise<ProfileCommentActivity[]> {
+  const admin = getAdminClient();
+  const { data, error } = await admin
+    .from("comments")
+    .select("id, body, created_at, script_id")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(error.message);
+
+  const rows = data || [];
+  const scriptIds = [...new Set(rows.map((c) => String(c.script_id)))];
+  const scriptMap = new Map<string, { title: string; game: string }>();
+
+  if (scriptIds.length) {
+    const { data: scripts } = await admin
+      .from("scripts")
+      .select("id, title, game")
+      .in("id", scriptIds);
+    for (const s of scripts || []) {
+      scriptMap.set(String(s.id), {
+        title: String(s.title || "Script"),
+        game: String(s.game || ""),
+      });
+    }
+  }
+
+  return rows.map((c) => {
+    const meta = scriptMap.get(String(c.script_id));
+    return {
+      id: String(c.id),
+      body: String(c.body || ""),
+      createdAt: String(c.created_at),
+      scriptId: String(c.script_id),
+      scriptTitle: meta?.title || "Script",
+      scriptGame: meta?.game || "",
+    };
+  });
+}
+
 export async function setScriptStaffFlags(
   id: string,
   flags: { featured?: boolean; staffVerified?: boolean }

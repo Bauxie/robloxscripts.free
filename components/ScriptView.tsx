@@ -14,6 +14,7 @@ import CompatVotes from "@/components/CompatVotes";
 import RecentlyViewed, { pushRecentScript } from "@/components/RecentlyViewed";
 import { EXECUTORS } from "@/lib/executors";
 import { gameHref } from "@/lib/games";
+import { profilePath } from "@/lib/profilePath";
 
 type GamePreview = {
   placeId: string;
@@ -187,7 +188,7 @@ export default function ScriptView({
                 )}
               </span>
               by{" "}
-              <Link href={`/u/${encodeURIComponent(s.author)}`}>
+              <Link href={profilePath(s.author)}>
                 <b>@{s.author}</b>
               </Link>
               <RoleBadges roles={s.authorRoles} size="sm" />

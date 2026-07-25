@@ -13,6 +13,7 @@ import RoleBadges from "@/components/RoleBadges";
 import RoleIcon from "@/components/RoleIcon";
 import { useToast } from "@/components/ToastProvider";
 import { timeAgo } from "@/lib/format";
+import { profilePath } from "@/lib/profilePath";
 
 type AdminUser = {
   id: string;
@@ -367,7 +368,7 @@ export default function AdminPanel({
                       </span>
                       <div>
                         <div className="admin-user-name">
-                          <Link href={`/u/${encodeURIComponent(user.username)}`}>
+                          <Link href={profilePath(user.username)}>
                             <strong>@{user.username}</strong>
                           </Link>
                           <RoleBadges roles={user.roles} size="sm" />

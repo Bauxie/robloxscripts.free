@@ -8,6 +8,7 @@ import LogoutButton from "@/components/LogoutButton";
 import ProfileSettings from "@/components/ProfileSettings";
 import RoleBadges from "@/components/RoleBadges";
 import { canModerate } from "@/lib/roles";
+import { profilePath } from "@/lib/profilePath";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -56,10 +57,7 @@ export default async function ProfilePage() {
             </div>
           </div>
           <div className="detail-cta">
-            <Link
-              href={`/u/${encodeURIComponent(profile.username)}`}
-              className="btn btn-ghost"
-            >
+            <Link href={profilePath(profile.username)} className="btn btn-ghost">
               Public profile
             </Link>
             {canModerate(profile.roles) ? (

@@ -3,9 +3,36 @@ import { NextResponse, type NextRequest } from "next/server";
 import { safeNextPath } from "@/lib/safeRedirect";
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
-    request: { headers: request.headers },
-  });
+  const path = request.nextUrl.pathname;
+
+  // Legacy /u/username → /@username
+  const legacy = path.match(/^\/u\/([^/]+)\/?$/);
+  if (legacy) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/@${decodeURIComponent(legacy[1])}`;
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Public profiles: /@username → app route /u/[username]
+  const atProfile = path.match(/^\/@([^/]+)\/?$/);
+  const rewriteUrl = atProfile
+    ? (() => {
+        const url = request.nextUrl.clone();
+        url.pathname = `/u/${decodeURIComponent(atProfile[1])}`;
+        return url;
+      })()
+    : null;
+
+  const makeResponse = () =>
+    rewriteUrl
+      ? NextResponse.rewrite(rewriteUrl, {
+          request: { headers: request.headers },
+        })
+      : NextResponse.next({
+          request: { headers: request.headers },
+        });
+
+  let response = makeResponse();
 
   const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "")
     .trim()
@@ -22,9 +49,7 @@ export async function updateSession(request: NextRequest) {
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
-        response = NextResponse.next({
-          request: { headers: request.headers },
-        });
+        response = makeResponse();
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
@@ -36,7 +61,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
   const needsAuth =
     path.startsWith("/upload") ||
     path.startsWith("/profile") ||

@@ -4,6 +4,7 @@ import { getAdminClient } from "@/lib/supabase/admin";
 import { listScripts, publicView } from "@/lib/store";
 import { enrichScriptViews } from "@/lib/thumbnails";
 import { createNotification } from "@/lib/notifications";
+import { profilePath } from "@/lib/profilePath";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
       kind: "follow",
       title: "New follower",
       body: `@${me?.username || "someone"} followed you`,
-      href: `/u/${encodeURIComponent(String(me?.username || ""))}`,
+      href: profilePath(String(me?.username || "")),
     }).catch(() => {});
 
     return NextResponse.json({ ok: true, following: true });

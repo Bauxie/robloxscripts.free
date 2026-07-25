@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { listScripts } from "@/lib/store";
 import { getAdminClient } from "@/lib/supabase/admin";
 import { slugifyGame } from "@/lib/games";
+import { profilePath } from "@/lib/profilePath";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -77,7 +78,7 @@ export async function GET() {
 
     for (const p of profiles || []) {
       urls.push(
-        urlEntry(`${SITE}/u/${encodeURIComponent(p.username as string)}`, {
+        urlEntry(`${SITE}${profilePath(String(p.username || ""))}`, {
           lastmod: p.created_at
             ? new Date(p.created_at as string).toISOString()
             : undefined,

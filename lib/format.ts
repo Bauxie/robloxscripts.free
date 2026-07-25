@@ -24,6 +24,20 @@ export function fmtBytes(n: number): string {
   return `${(n / 1048576).toFixed(1)} MB`;
 }
 
+/** Compact counts for stats (e.g. 278.0K). */
+export function fmtCompact(n: number): string {
+  const v = Math.max(0, Math.floor(Number(n) || 0));
+  if (v >= 1_000_000) {
+    const s = (v / 1_000_000).toFixed(1);
+    return `${s.endsWith(".0") ? s.slice(0, -2) : s}M`;
+  }
+  if (v >= 1_000) {
+    const s = (v / 1_000).toFixed(1);
+    return `${s.endsWith(".0") ? s.slice(0, -2) : s}K`;
+  }
+  return String(v);
+}
+
 // Naive Lua syntax highlighter -> returns HTML string
 export function highlightLua(code: string): string {
   const kw =

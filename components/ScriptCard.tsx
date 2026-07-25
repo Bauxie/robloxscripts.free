@@ -7,6 +7,7 @@ import RoleBadges from "@/components/RoleBadges";
 import { EXECUTORS } from "@/lib/executors";
 import ScriptManageButtons from "@/components/ScriptManageButtons";
 import { gameHref } from "@/lib/games";
+import { profilePath } from "@/lib/profilePath";
 
 export default function ScriptCard({
   s,
@@ -90,7 +91,7 @@ export default function ScriptCard({
           </div>
         ) : null}
         <div className="meta">
-          <Link href={`/u/${encodeURIComponent(s.author)}`} className="who">
+          <Link href={profilePath(s.author)} className="who">
             <span className="author-avatar">
               {s.authorAvatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
