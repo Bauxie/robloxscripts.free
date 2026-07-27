@@ -1151,21 +1151,23 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   place-items: center;
   flex: 0 0 auto;
   border-radius: 8px;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
   overflow: hidden;
   vertical-align: middle;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
+  background: #fff;
 }
 .exec-logo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   background: #fff;
 }
 .exec-logo-lg {
-  border-radius: 18px;
+  border-radius: 16px;
   border-width: 3px;
+  box-shadow: 2px 2px 0 var(--line);
 }
 .exec-logo-fallback {
   font-family: "Fredoka", sans-serif;

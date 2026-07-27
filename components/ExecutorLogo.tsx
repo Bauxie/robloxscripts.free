@@ -18,7 +18,7 @@ export default function ExecutorLogo({
       style={{
         width: size,
         height: size,
-        background: executor.color,
+        background: "#fff",
       }}
       title={executor.name}
     >

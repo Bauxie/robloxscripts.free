@@ -58,8 +58,8 @@ export const EXECUTORS: Executor[] = [
     status: "Working",
     features: ["Mobile support", "Delta UI", "Script save"],
     website: "https://codex.lol",
-    color: "#b8f5c8",
-    logo: "/executors/codex.png",
+    color: "#ffffff",
+    logo: "/executors/codex.svg",
   },
   {
     id: "velocity",
@@ -70,8 +70,8 @@ export const EXECUTORS: Executor[] = [
     status: "Updating",
     features: ["Quick inject", "Free forever", "Active Discord"],
     website: "#",
-    color: "#ffc9b8",
-    logo: "/executors/velocity.png",
+    color: "#ffffff",
+    logo: "/executors/velocity-black.png",
   },
   {
     id: "argon",
