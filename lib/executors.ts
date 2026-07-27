@@ -85,7 +85,7 @@ export const EXECUTORS: Executor[] = [
     updateStatus: "Not updated",
     features: ["Lifetime option", "High UNC", "Windows focused"],
     website: "https://getcosmic.net",
-    color: "#7b5cff",
+    color: "#c9b6ff",
     logo: "/executors/cosmic.svg",
   },
   {
