@@ -1,6 +1,7 @@
 "use client";
 
 import { EXECUTORS } from "@/lib/executors";
+import ExecutorLogo from "@/components/ExecutorLogo";
 
 export default function ExecutorPicker({
   name = "executors",
@@ -30,8 +31,8 @@ export default function ExecutorPicker({
           {EXECUTORS.map((ex) => (
             <label key={ex.id} className="executor-chip">
               <input type="checkbox" name={name} value={ex.id} />
-              <span>
-                {ex.emoji} {ex.name}
+              <span className="executor-chip-label">
+                <ExecutorLogo executor={ex} size={18} /> {ex.name}
               </span>
             </label>
           ))}
@@ -55,8 +56,8 @@ export default function ExecutorPicker({
               checked={selected.has(ex.id)}
               onChange={() => toggle(ex.id)}
             />
-            <span>
-              {ex.emoji} {ex.name}
+            <span className="executor-chip-label">
+              <ExecutorLogo executor={ex} size={18} /> {ex.name}
             </span>
           </label>
         ))}

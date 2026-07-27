@@ -15,6 +15,8 @@ import RecentlyViewed, { pushRecentScript } from "@/components/RecentlyViewed";
 import { EXECUTORS } from "@/lib/executors";
 import { gameHref } from "@/lib/games";
 import { profilePath } from "@/lib/profilePath";
+import ExecutorLogo from "@/components/ExecutorLogo";
+import ScriptCard from "@/components/ScriptCard";
 
 type GamePreview = {
   placeId: string;
@@ -30,6 +32,7 @@ function likeKey(id: string) {
 export default function ScriptView({
   s,
   game,
+  related = [],
   canEdit = false,
   canComment = false,
   canReport = false,
@@ -38,7 +41,8 @@ export default function ScriptView({
   canModerateScript = false,
 }: {
   s: ScriptViewType;
-  game?: GamePreview | null;
+  game: GamePreview | null;
+  related?: ScriptViewType[];
   canEdit?: boolean;
   canComment?: boolean;
   canReport?: boolean;
@@ -171,6 +175,7 @@ export default function ScriptView({
               <span className="version-pill">v{s.version || 1}</span>
             </h1>
             <div className="script-badges">
+              {s.keySystem ? <span className="badge-key-system">🔑 Key System</span> : null}
               {staffVerified ? (
                 <span className="badge-verified-script" title="Staff reviewed">
                   ✓ Staff verified
@@ -223,9 +228,9 @@ export default function ScriptView({
                   <Link
                     key={ex!.id}
                     href={`/scripts?executor=${encodeURIComponent(ex!.id)}`}
-                    className="tag tag-link"
+                    className="tag tag-link tag-exec"
                   >
-                    {ex!.emoji} {ex!.name}
+                    <ExecutorLogo executor={ex!} size={16} /> {ex!.name}
                   </Link>
                 ))}
               </div>
@@ -379,6 +384,32 @@ export default function ScriptView({
         />
 
         <CommentsSection scriptId={s.id} canComment={canComment} />
+
+        {related.length ? (
+          <section className="related-scripts">
+            <div className="section-head" style={{ marginTop: 28 }}>
+              <div>
+                <h2>🧩 Related scripts</h2>
+                <p>
+                  {s.game
+                    ? `More like this — same game or tags as ${s.game}`
+                    : "More scripts with similar tags"}
+                </p>
+              </div>
+              {s.game ? (
+                <Link href={gameHref(s.game)} className="btn btn-ghost btn-sm">
+                  All {s.game} →
+                </Link>
+              ) : null}
+            </div>
+            <div className="grid">
+              {related.map((r) => (
+                <ScriptCard key={r.id} s={r} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <RecentlyViewed excludeId={s.id} />
       </div>
     </main>

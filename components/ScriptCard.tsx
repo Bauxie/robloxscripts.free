@@ -6,6 +6,7 @@ import { timeAgo } from "@/lib/format";
 import RoleBadges from "@/components/RoleBadges";
 import { EXECUTORS } from "@/lib/executors";
 import ScriptManageButtons from "@/components/ScriptManageButtons";
+import ExecutorLogo from "@/components/ExecutorLogo";
 import { gameHref } from "@/lib/games";
 import { profilePath } from "@/lib/profilePath";
 
@@ -40,6 +41,7 @@ export default function ScriptCard({
             🎮
           </div>
         )}
+        {s.keySystem ? <span className="badge-key-system card-media-key">🔑 Key System</span> : null}
         {s.game ? (
           <div className="card-media-game" title={s.game}>
             🎮 {s.game}
@@ -59,12 +61,13 @@ export default function ScriptCard({
           </h3>
           <p className="desc">{s.description || "No description provided."}</p>
         </Link>
-        {(s.featured || s.staffVerified) && (
+        {(s.featured || s.staffVerified || s.keySystem) && (
           <div className="script-badges">
             {s.featured ? <span className="badge-featured">★ Featured</span> : null}
             {s.staffVerified ? (
               <span className="badge-verified-script">Staff verified</span>
             ) : null}
+            {s.keySystem ? <span className="badge-key-system">🔑 Key System</span> : null}
           </div>
         )}
         {s.game ? (
@@ -84,8 +87,8 @@ export default function ScriptCard({
         {executors.length ? (
           <div className="tags executor-tags">
             {executors.map((ex) => (
-              <span className="tag" key={ex!.id}>
-                {ex!.emoji} {ex!.name}
+              <span className="tag tag-exec" key={ex!.id}>
+                <ExecutorLogo executor={ex!} size={16} /> {ex!.name}
               </span>
             ))}
           </div>

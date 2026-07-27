@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getScript, incrementViews, publicView } from "@/lib/store";
+import { getScript, getRelatedScripts, incrementViews, publicView } from "@/lib/store";
 import { resolveRobloxGame } from "@/lib/roblox";
-import { withAuthorAvatars } from "@/lib/thumbnails";
+import { enrichScriptViews, withAuthorAvatars } from "@/lib/thumbnails";
 import { buildScriptMetadata, scriptJsonLd } from "@/lib/seo";
 import { getCurrentProfile } from "@/lib/auth";
 import { canModerate } from "@/lib/roles";
@@ -73,6 +73,8 @@ export default async function ScriptPage({ params }: PageProps) {
   });
 
   const [view] = await withAuthorAvatars([publicView(record, true)]);
+  const relatedRaw = await getRelatedScripts(record, 6).catch(() => []);
+  const related = await enrichScriptViews(relatedRaw.map((s) => publicView(s)));
   const me = await getCurrentProfile().catch(() => null);
   const canEdit = Boolean(me && record.userId && me.id === record.userId);
   const canComment = Boolean(me);
@@ -92,6 +94,7 @@ export default async function ScriptPage({ params }: PageProps) {
       <ScriptView
         s={view}
         game={game}
+        related={related}
         canEdit={canEdit}
         canComment={canComment}
         canReport={canReport}

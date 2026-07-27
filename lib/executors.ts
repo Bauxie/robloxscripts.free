@@ -8,7 +8,8 @@ export type Executor = {
   features: string[];
   website: string;
   color: string;
-  emoji: string;
+  /** Path under /public */
+  logo: string;
 };
 
 export const EXECUTORS: Executor[] = [
@@ -22,7 +23,7 @@ export const EXECUTORS: Executor[] = [
     features: ["UNC support", "Fast attach", "Script hub"],
     website: "https://getsolara.dev",
     color: "#ffe08a",
-    emoji: "☀️",
+    logo: "/executors/solara.png",
   },
   {
     id: "xeno",
@@ -34,7 +35,7 @@ export const EXECUTORS: Executor[] = [
     features: ["Keyless options", "Stable inject", "Community scripts"],
     website: "https://xeno.onl",
     color: "#c9b6ff",
-    emoji: "⚡",
+    logo: "/executors/xeno.png",
   },
   {
     id: "wave",
@@ -46,7 +47,7 @@ export const EXECUTORS: Executor[] = [
     features: ["High UNC", "Smooth UI", "Regular patches"],
     website: "https://wave.wtf",
     color: "#9fdcff",
-    emoji: "🌊",
+    logo: "/executors/wave.svg",
   },
   {
     id: "codex",
@@ -58,7 +59,7 @@ export const EXECUTORS: Executor[] = [
     features: ["Mobile support", "Delta UI", "Script save"],
     website: "https://codex.lol",
     color: "#b8f5c8",
-    emoji: "📱",
+    logo: "/executors/codex.png",
   },
   {
     id: "velocity",
@@ -70,7 +71,7 @@ export const EXECUTORS: Executor[] = [
     features: ["Quick inject", "Free forever", "Active Discord"],
     website: "#",
     color: "#ffc9b8",
-    emoji: "🚀",
+    logo: "/executors/velocity.png",
   },
   {
     id: "argon",
@@ -82,6 +83,6 @@ export const EXECUTORS: Executor[] = [
     features: ["Simple UI", "Auto-update", "Lua runner"],
     website: "#",
     color: "#ffd6ea",
-    emoji: "💎",
+    logo: "/executors/argon.svg",
   },
 ];

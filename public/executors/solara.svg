@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Solara">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffe08a"/>
+      <stop offset="100%" stop-color="#ffb020"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#1a2f3d"/>
+  <circle cx="32" cy="32" r="14" fill="url(#g)"/>
+  <g stroke="#ffe08a" stroke-width="3" stroke-linecap="round">
+    <path d="M32 8v6M32 50v6M8 32h6M50 32h6M14 14l4.5 4.5M45.5 45.5L50 50M50 14l-4.5 4.5M18.5 45.5L14 50"/>
+  </g>
+</svg>

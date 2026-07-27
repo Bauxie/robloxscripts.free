@@ -25,6 +25,7 @@ export type ScriptRecord = {
   staffVerified: boolean;
   worksCount: number;
   brokenCount: number;
+  keySystem: boolean;
   userId?: string | null;
 };
 
@@ -59,6 +60,7 @@ type ScriptRow = {
   staff_verified?: boolean | null;
   works_count?: number | null;
   broken_count?: number | null;
+  key_system?: boolean | null;
   user_id?: string | null;
 };
 
@@ -103,6 +105,7 @@ function fromRow(row: ScriptRow): ScriptRecord {
     staffVerified: Boolean(row.staff_verified),
     worksCount: row.works_count || 0,
     brokenCount: row.broken_count || 0,
+    keySystem: Boolean(row.key_system),
     userId: row.user_id ?? null,
   };
 }
@@ -130,6 +133,7 @@ function toRow(s: ScriptRecord) {
     staff_verified: s.staffVerified,
     works_count: s.worksCount,
     broken_count: s.brokenCount,
+    key_system: s.keySystem,
     user_id: s.userId ?? null,
   };
 }
@@ -156,6 +160,7 @@ export function publicView(s: ScriptRecord, includeCode = false): ScriptView {
     staffVerified: s.staffVerified,
     worksCount: s.worksCount,
     brokenCount: s.brokenCount,
+    keySystem: s.keySystem,
     userId: s.userId,
     lines: s.code ? s.code.split("\n").length : 0,
     size: s.code ? new TextEncoder().encode(s.code).length : 0,
@@ -193,6 +198,7 @@ export type ListScriptsOpts = {
   gameSlug?: string;
   tag?: string;
   executor?: string;
+  keySystem?: boolean;
   verified?: boolean;
   staffVerified?: boolean;
   featured?: boolean;
@@ -248,6 +254,9 @@ function sortAndFilter(
   if (executor) {
     list = list.filter((s) => (s.executors || []).includes(executor));
   }
+  if (opts?.keySystem) {
+    list = list.filter((s) => s.keySystem);
+  }
   if (opts?.verified && verifiedUserIds) {
     list = list.filter((s) => s.userId && verifiedUserIds.has(s.userId));
   }
@@ -288,6 +297,36 @@ export async function listScripts(opts?: ListScriptsOpts): Promise<ScriptRecord[
   return sortAndFilter(((data || []) as ScriptRow[]).map(fromRow), opts, verifiedUserIds);
 }
 
+/** Related scripts by shared game / tags (excludes the current script). */
+export async function getRelatedScripts(
+  script: Pick<ScriptRecord, "id" | "game" | "tags" | "userId">,
+  limit = 6
+): Promise<ScriptRecord[]> {
+  const all = await listScripts({ sort: "popular" });
+  const game = (script.game || "").trim().toLowerCase();
+  const tags = new Set((script.tags || []).map((t) => t.toLowerCase()));
+
+  const scored = all
+    .filter((s) => s.id !== script.id)
+    .map((s) => {
+      let score = 0;
+      const sGame = (s.game || "").trim().toLowerCase();
+      if (game && sGame && (sGame === game || sGame.includes(game) || game.includes(sGame))) {
+        score += 50;
+      }
+      for (const t of s.tags || []) {
+        if (tags.has(t.toLowerCase())) score += 12;
+      }
+      if (script.userId && s.userId && script.userId === s.userId) score += 8;
+      score += Math.min(10, Math.log10((s.views || 0) + 1) * 3);
+      return { s, score };
+    })
+    .filter((x) => x.score >= 12)
+    .sort((a, b) => b.score - a.score || (b.s.views || 0) - (a.s.views || 0));
+
+  return scored.slice(0, limit).map((x) => x.s);
+}
+
 export async function listGameSlugs(): Promise<{ slug: string; name: string; count: number }[]> {
   const scripts = await listScripts({ sort: "new" });
   const map = new Map<string, { name: string; count: number }>();
@@ -319,7 +358,7 @@ export async function createScriptWithClient(
   const row = toRow(record);
   const { data, error } = await client.from("scripts").insert(row).select("*").single();
   if (error) {
-    if (/executors|updated_at|changelog|version|featured|staff_verified|works_count/i.test(error.message)) {
+    if (/executors|updated_at|changelog|version|featured|staff_verified|works_count|key_system/i.test(error.message)) {
       const fallback = {
         id: row.id,
         title: row.title,
@@ -334,6 +373,7 @@ export async function createScriptWithClient(
         copies: row.copies,
         likes: row.likes,
         created_at: row.created_at,
+        key_system: row.key_system,
         user_id: row.user_id,
       };
       const retry = await client.from("scripts").insert(fallback).select("*").single();
@@ -367,6 +407,7 @@ export async function updateScriptWithClient(
   if (patch.code != null) updates.code = patch.code;
   if (patch.changelog != null) updates.changelog = patch.changelog;
   if (patch.version != null) updates.version = patch.version;
+  if (patch.keySystem != null) updates.key_system = patch.keySystem;
 
   const { data, error } = await client
     .from("scripts")
@@ -375,7 +416,7 @@ export async function updateScriptWithClient(
     .select("*")
     .single();
   if (error) {
-    if (/executors|updated_at|changelog|version/i.test(error.message)) {
+    if (/executors|updated_at|changelog|version|key_system/i.test(error.message)) {
       const soft: Record<string, unknown> = {};
       if (patch.title != null) soft.title = patch.title;
       if (patch.description != null) soft.description = patch.description;
@@ -384,6 +425,7 @@ export async function updateScriptWithClient(
       if (patch.tags != null) soft.tags = patch.tags;
       if (patch.executors != null) soft.executors = patch.executors;
       if (patch.code != null) soft.code = patch.code;
+      if (patch.keySystem != null) soft.key_system = patch.keySystem;
       const retry = await client.from("scripts").update(soft).eq("id", id).select("*").single();
       if (retry.error) throw new Error(retry.error.message);
       return fromRow(retry.data as ScriptRow);

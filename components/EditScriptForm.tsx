@@ -17,6 +17,7 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
   const [code, setCode] = useState(script.code || "");
   const [tags, setTags] = useState((script.tags || []).join(","));
   const [executors, setExecutors] = useState(script.executors || []);
+  const [keySystem, setKeySystem] = useState(Boolean(script.keySystem));
   const [changelog, setChangelog] = useState("");
   const [newVersion, setNewVersion] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -37,6 +38,7 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
           code,
           tags,
           executors,
+          keySystem,
           changelog,
           newVersion,
         }),
@@ -100,6 +102,14 @@ export default function EditScriptForm({ script }: { script: ScriptView }) {
           <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="op, autofarm" />
         </div>
         <ExecutorPicker value={executors} onChange={setExecutors} />
+        <label className="filter-check">
+          <input
+            type="checkbox"
+            checked={keySystem}
+            onChange={(e) => setKeySystem(e.target.checked)}
+          />
+          This script uses a key system
+        </label>
         <div>
           <label>Description</label>
           <textarea

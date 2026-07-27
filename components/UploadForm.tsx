@@ -121,6 +121,10 @@ export default function UploadPage({ username }: { username: string }) {
           </div>
           <TagInput name="tags" />
           <ExecutorPicker name="executors" />
+          <label className="filter-check">
+            <input type="checkbox" name="keySystem" value="1" />
+            This script uses a key system
+          </label>
           <div className="hint" style={{ marginTop: -8 }}>
             Author is set from your profile (@{username}).
           </div>

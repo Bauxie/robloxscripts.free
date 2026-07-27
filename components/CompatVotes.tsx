@@ -94,7 +94,7 @@ export default function CompatVotes({
         >
           {EXECUTORS.map((ex) => (
             <option key={ex.id} value={ex.id}>
-              {ex.emoji} {ex.name}
+              {ex.name}
             </option>
           ))}
         </select>

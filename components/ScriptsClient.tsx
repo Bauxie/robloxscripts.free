@@ -14,6 +14,7 @@ export default function ScriptsClient() {
   const initialGame = searchParams.get("game") || "";
   const initialTag = searchParams.get("tag") || "";
   const initialExecutor = searchParams.get("executor") || "";
+  const initialKeySystem = searchParams.get("keySystem") === "1";
   const initialVerified = searchParams.get("verified") === "1";
   const initialStaffVerified = searchParams.get("staffVerified") === "1";
 
@@ -22,6 +23,7 @@ export default function ScriptsClient() {
   const [game, setGame] = useState(initialGame);
   const [tag, setTag] = useState(initialTag);
   const [executor, setExecutor] = useState(initialExecutor);
+  const [keySystem, setKeySystem] = useState(initialKeySystem);
   const [verified, setVerified] = useState(initialVerified);
   const [staffVerified, setStaffVerified] = useState(initialStaffVerified);
   const [scripts, setScripts] = useState<ScriptView[] | null>(null);
@@ -34,6 +36,7 @@ export default function ScriptsClient() {
     gameF: string;
     tagF: string;
     executorF: string;
+    keySystemF: boolean;
     verifiedF: boolean;
     staffVerifiedF: boolean;
   }) {
@@ -45,6 +48,7 @@ export default function ScriptsClient() {
       if (opts.gameF) params.set("game", opts.gameF);
       if (opts.tagF) params.set("tag", opts.tagF);
       if (opts.executorF) params.set("executor", opts.executorF);
+      if (opts.keySystemF) params.set("keySystem", "1");
       if (opts.verifiedF) params.set("verified", "1");
       if (opts.staffVerifiedF) params.set("staffVerified", "1");
       const res = await fetch("/api/scripts?" + params.toString());
@@ -71,6 +75,7 @@ export default function ScriptsClient() {
     setGame(initialGame);
     setTag(initialTag);
     setExecutor(prefExecutor);
+    setKeySystem(initialKeySystem);
     setVerified(initialVerified);
     setStaffVerified(initialStaffVerified);
     load({
@@ -79,11 +84,12 @@ export default function ScriptsClient() {
       gameF: initialGame,
       tagF: initialTag,
       executorF: prefExecutor,
+      keySystemF: initialKeySystem,
       verifiedF: initialVerified,
       staffVerifiedF: initialStaffVerified,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialQ, initialSort, initialGame, initialTag, initialExecutor, initialVerified, initialStaffVerified]);
+  }, [initialQ, initialSort, initialGame, initialTag, initialExecutor, initialKeySystem, initialVerified, initialStaffVerified]);
 
   function reload(
     next?: Partial<{
@@ -92,6 +98,7 @@ export default function ScriptsClient() {
       game: string;
       tag: string;
       executor: string;
+      keySystem: boolean;
       verified: boolean;
       staffVerified: boolean;
     }>
@@ -102,6 +109,7 @@ export default function ScriptsClient() {
       gameF: next?.game ?? game,
       tagF: next?.tag ?? tag,
       executorF: next?.executor ?? executor,
+      keySystemF: next?.keySystem ?? keySystem,
       verifiedF: next?.verified ?? verified,
       staffVerifiedF: next?.staffVerified ?? staffVerified,
     };
@@ -198,6 +206,17 @@ export default function ScriptsClient() {
             </option>
           ))}
         </select>
+        <label className="filter-check">
+          <input
+            type="checkbox"
+            checked={keySystem}
+            onChange={(e) => {
+              setKeySystem(e.target.checked);
+              reload({ keySystem: e.target.checked });
+            }}
+          />
+          Key system
+        </label>
         <label className="filter-check">
           <input
             type="checkbox"

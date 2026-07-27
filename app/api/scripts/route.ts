@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
     const game = req.nextUrl.searchParams.get("game") || "";
     const tag = req.nextUrl.searchParams.get("tag") || "";
     const executor = req.nextUrl.searchParams.get("executor") || "";
+    const keySystem = req.nextUrl.searchParams.get("keySystem") === "1";
     const verified = req.nextUrl.searchParams.get("verified") === "1";
     const staffVerified = req.nextUrl.searchParams.get("staffVerified") === "1";
     const featured = req.nextUrl.searchParams.get("featured") === "1";
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
       game,
       tag,
       executor,
+      keySystem: keySystem || undefined,
       verified,
       staffVerified,
       featured,
@@ -92,6 +94,7 @@ export async function POST(req: NextRequest) {
     let tagsRaw: unknown = "";
     let executorsRaw: unknown = "";
     let code = "";
+    let keySystem = false;
 
     if (contentType.includes("application/json")) {
       const body = await req.json();
@@ -101,6 +104,7 @@ export async function POST(req: NextRequest) {
       tagsRaw = body.tags;
       executorsRaw = body.executors;
       code = (body.code || "").toString();
+      keySystem = Boolean(body.keySystem);
     } else {
       const form = await req.formData();
       title = (form.get("title") || "").toString();
@@ -109,6 +113,10 @@ export async function POST(req: NextRequest) {
       tagsRaw = form.get("tags");
       executorsRaw = form.getAll("executors");
       code = (form.get("code") || "").toString();
+      keySystem =
+        form.get("keySystem") === "1" ||
+        form.get("keySystem") === "on" ||
+        form.get("keySystem") === "true";
       const file = form.get("file");
       if (file && typeof file !== "string") {
         const size = typeof file.size === "number" ? file.size : 0;
@@ -165,6 +173,7 @@ export async function POST(req: NextRequest) {
       staffVerified: false,
       worksCount: 0,
       brokenCount: 0,
+      keySystem,
       userId: user.id,
     };
 

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Wave">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9fdcff"/>
+      <stop offset="100%" stop-color="#2f9ed8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#1a2f3d"/>
+  <path d="M8 40c6-10 12-10 18 0s12 10 18 0 12-10 18 0v8c-6-10-12-10-18 0s-12 10-18 0-12-10-18 0v-8z" fill="url(#g)"/>
+  <path d="M8 28c6-10 12-10 18 0s12 10 18 0 12-10 18 0" fill="none" stroke="#9fdcff" stroke-width="3" stroke-linecap="round"/>
+</svg>

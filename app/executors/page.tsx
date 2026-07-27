@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EXECUTORS } from "@/lib/executors";
 import SponsorSlots from "@/components/SponsorSlots";
+import ExecutorLogo from "@/components/ExecutorLogo";
 
 export const metadata = {
   title: "Executors — robloxscripts.free",
@@ -42,9 +43,7 @@ export default function ExecutorsPage() {
         {EXECUTORS.map((ex) => (
           <article key={ex.id} className="exec-card" style={{ ["--exec-color" as string]: ex.color }}>
             <div className="exec-top">
-              <span className="exec-emoji" aria-hidden="true">
-                {ex.emoji}
-              </span>
+              <ExecutorLogo executor={ex} size={52} className="exec-logo-lg" />
               <span className={`exec-status ${statusClass(ex.status)}`}>{ex.status}</span>
             </div>
             <h3>{ex.name}</h3>

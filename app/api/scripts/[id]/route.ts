@@ -81,6 +81,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     let gamePlaceId = existing.gamePlaceId;
     let tags = existing.tags;
     let executors = existing.executors;
+    let keySystem = existing.keySystem;
     let changelog = existing.changelog;
     let version = existing.version;
     const bumpVersion = Boolean(body.newVersion);
@@ -90,6 +91,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (typeof body.code === "string") code = body.code;
     if (body.tags != null) tags = sanitizeTags(body.tags, game);
     if (body.executors != null) executors = sanitizeExecutors(body.executors);
+    if (typeof body.keySystem === "boolean") keySystem = body.keySystem;
     if (typeof body.changelog === "string") changelog = body.changelog.trim().slice(0, 2000);
 
     if (typeof body.gameLink === "string") {
@@ -130,6 +132,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       gamePlaceId,
       tags,
       executors,
+      keySystem,
       changelog,
       version,
     });

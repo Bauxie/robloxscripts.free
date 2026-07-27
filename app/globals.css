@@ -1146,6 +1146,62 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   background: #fff; border: 3px solid var(--line); border-radius: 18px;
   box-shadow: var(--shadow-sm);
 }
+.exec-logo {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  border: 2px solid var(--line);
+  overflow: hidden;
+  vertical-align: middle;
+  box-shadow: var(--shadow-sm);
+}
+.exec-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #fff;
+}
+.exec-logo-lg {
+  border-radius: 18px;
+  border-width: 3px;
+}
+.exec-logo-fallback {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 800;
+  font-size: 0.7em;
+  color: var(--ink);
+}
+.tag-exec {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.executor-chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-key-system {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: #fff3c4;
+  color: #7a5200;
+}
+.card-media-key {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 2;
+  box-shadow: var(--shadow-sm);
+}
 .exec-status {
   font-size: 12px; font-weight: 800; padding: 5px 10px; border-radius: 999px;
   border: 2px solid var(--line); box-shadow: 2px 2px 0 var(--line);
