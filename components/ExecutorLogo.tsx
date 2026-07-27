@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Executor } from "@/lib/executors";
 
 /** Small branded logo for an executor (img with letter fallback). */
@@ -12,6 +13,8 @@ export default function ExecutorLogo({
   size?: number;
   className?: string;
 }) {
+  const [failed, setFailed] = useState(false);
+
   return (
     <span
       className={`exec-logo ${className}`.trim()}
@@ -22,25 +25,21 @@ export default function ExecutorLogo({
       }}
       title={executor.name}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={executor.logo}
-        alt=""
-        width={size}
-        height={size}
-        loading="lazy"
-        onError={(e) => {
-          const img = e.currentTarget;
-          img.style.display = "none";
-          const parent = img.parentElement;
-          if (parent && !parent.querySelector(".exec-logo-fallback")) {
-            const span = document.createElement("span");
-            span.className = "exec-logo-fallback";
-            span.textContent = executor.name.slice(0, 1).toUpperCase();
-            parent.appendChild(span);
-          }
-        }}
-      />
+      {failed ? (
+        <span className="exec-logo-fallback" aria-hidden>
+          {executor.name.slice(0, 1).toUpperCase()}
+        </span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={executor.logo}
+          alt=""
+          width={size}
+          height={size}
+          loading="lazy"
+          onError={() => setFailed(true)}
+        />
+      )}
     </span>
   );
 }

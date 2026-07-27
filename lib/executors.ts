@@ -70,8 +70,8 @@ export const EXECUTORS: Executor[] = [
     status: "Updating",
     features: ["Quick inject", "Free forever", "Active Discord"],
     website: "#",
-    color: "#ffffff",
-    logo: "/executors/velocity-black.png",
+    color: "#111111",
+    logo: "/executors/velocity.png",
   },
   {
     id: "argon",
