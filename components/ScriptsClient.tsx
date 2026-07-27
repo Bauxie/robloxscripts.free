@@ -62,19 +62,13 @@ export default function ScriptsClient() {
   }
 
   useEffect(() => {
-    let prefExecutor = initialExecutor;
-    if (!prefExecutor) {
-      try {
-        prefExecutor = localStorage.getItem("rs_executor_pref") || "";
-      } catch {
-        prefExecutor = "";
-      }
-    }
+    // Only filter by executor when the URL asks for it — don't silently
+    // apply localStorage prefs (that made every browse look like "Velocity only").
     setQ(initialQ);
     setSort(initialSort);
     setGame(initialGame);
     setTag(initialTag);
-    setExecutor(prefExecutor);
+    setExecutor(initialExecutor);
     setKeySystem(initialKeySystem);
     setVerified(initialVerified);
     setStaffVerified(initialStaffVerified);
@@ -83,7 +77,7 @@ export default function ScriptsClient() {
       sortBy: initialSort,
       gameF: initialGame,
       tagF: initialTag,
-      executorF: prefExecutor,
+      executorF: initialExecutor,
       keySystemF: initialKeySystem,
       verifiedF: initialVerified,
       staffVerifiedF: initialStaffVerified,

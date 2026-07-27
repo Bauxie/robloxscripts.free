@@ -12,7 +12,7 @@ import AdUnit from "@/components/AdUnit";
 import FavoriteButton from "@/components/FavoriteButton";
 import CompatVotes from "@/components/CompatVotes";
 import RecentlyViewed, { pushRecentScript } from "@/components/RecentlyViewed";
-import { EXECUTORS } from "@/lib/executors";
+import { resolveExecutorLabel } from "@/lib/executors";
 import { gameHref } from "@/lib/games";
 import { profilePath } from "@/lib/profilePath";
 import ExecutorLogo from "@/components/ExecutorLogo";
@@ -159,8 +159,8 @@ export default function ScriptView({
 
   const gameLabel = game?.name || s.game || "Roblox game";
   const executorLabels = (s.executors || [])
-    .map((id) => EXECUTORS.find((e) => e.id === id))
-    .filter(Boolean);
+    .map((id) => resolveExecutorLabel(id))
+    .filter((x) => x.id);
 
   return (
     <main className="app">
@@ -226,11 +226,11 @@ export default function ScriptView({
               <div className="tags" style={{ marginTop: 8 }}>
                 {executorLabels.map((ex) => (
                   <Link
-                    key={ex!.id}
-                    href={`/scripts?executor=${encodeURIComponent(ex!.id)}`}
+                    key={ex.id}
+                    href={`/scripts?executor=${encodeURIComponent(ex.id)}`}
                     className="tag tag-link tag-exec"
                   >
-                    <ExecutorLogo executor={ex!} size={16} /> {ex!.name}
+                    {ex.executor ? <ExecutorLogo executor={ex.executor} size={16} /> : null} {ex.name}
                   </Link>
                 ))}
               </div>

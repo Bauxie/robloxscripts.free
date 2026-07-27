@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ScriptView } from "@/lib/store";
 import { timeAgo } from "@/lib/format";
 import RoleBadges from "@/components/RoleBadges";
-import { EXECUTORS } from "@/lib/executors";
+import { resolveExecutorLabel } from "@/lib/executors";
 import ScriptManageButtons from "@/components/ScriptManageButtons";
 import ExecutorLogo from "@/components/ExecutorLogo";
 import { gameHref } from "@/lib/games";
@@ -22,9 +22,9 @@ export default function ScriptCard({
   manage?: boolean;
 }) {
   const executors = (s.executors || [])
-    .map((id) => EXECUTORS.find((e) => e.id === id))
-    .filter(Boolean)
-    .slice(0, 3);
+    .map((id) => resolveExecutorLabel(id))
+    .filter((x) => x.id)
+    .slice(0, 6);
 
   return (
     <article
@@ -87,8 +87,8 @@ export default function ScriptCard({
         {executors.length ? (
           <div className="tags executor-tags">
             {executors.map((ex) => (
-              <span className="tag tag-exec" key={ex!.id}>
-                <ExecutorLogo executor={ex!} size={16} /> {ex!.name}
+              <span className="tag tag-exec" key={ex.id}>
+                {ex.executor ? <ExecutorLogo executor={ex.executor} size={16} /> : null} {ex.name}
               </span>
             ))}
           </div>

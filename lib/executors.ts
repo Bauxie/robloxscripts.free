@@ -105,3 +105,36 @@ export const EXECUTORS: Executor[] = [
 export function isFreePrice(price: Executor["price"]) {
   return price === "Free" || price === "Key System";
 }
+
+/** Old executor ids that may still be stored on scripts. */
+const LEGACY_EXECUTOR_NAMES: Record<string, string> = {
+  solara: "Solara",
+  xeno: "Xeno",
+  wave: "Wave",
+  codex: "Codex",
+  argon: "Argon",
+};
+
+export function getExecutor(id: string): Executor | null {
+  const key = String(id || "").trim().toLowerCase();
+  return EXECUTORS.find((e) => e.id === key) || null;
+}
+
+/** Resolve an executor id for display (current list or legacy name). */
+export function resolveExecutorLabel(id: string): {
+  id: string;
+  name: string;
+  executor: Executor | null;
+} {
+  const key = String(id || "").trim().toLowerCase();
+  const executor = getExecutor(key);
+  if (executor) return { id: executor.id, name: executor.name, executor };
+  const legacy = LEGACY_EXECUTOR_NAMES[key];
+  if (legacy) return { id: key, name: legacy, executor: null };
+  if (!key) return { id: "", name: "", executor: null };
+  return {
+    id: key,
+    name: key.replace(/(^|-)(\w)/g, (_, _a, c: string) => c.toUpperCase()),
+    executor: null,
+  };
+}
