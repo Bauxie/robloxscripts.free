@@ -6,7 +6,6 @@ import { timeAgo } from "@/lib/format";
 import RoleBadges from "@/components/RoleBadges";
 import { resolveExecutorLabel } from "@/lib/executors";
 import ScriptManageButtons from "@/components/ScriptManageButtons";
-import ExecutorLogo from "@/components/ExecutorLogo";
 import { gameHref } from "@/lib/games";
 import { profilePath } from "@/lib/profilePath";
 
@@ -87,8 +86,8 @@ export default function ScriptCard({
         {executors.length ? (
           <div className="tags executor-tags">
             {executors.map((ex) => (
-              <span className="tag tag-exec" key={ex.id}>
-                {ex.executor ? <ExecutorLogo executor={ex.executor} size={16} /> : null} {ex.name}
+              <span className="tag" key={ex.id}>
+                {ex.name}
               </span>
             ))}
           </div>
