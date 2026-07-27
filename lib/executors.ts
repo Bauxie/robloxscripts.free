@@ -25,7 +25,7 @@ export const EXECUTORS: Executor[] = [
     recommended: true,
     features: ["Quick inject", "Active updates", "Script hub friendly"],
     website: "https://getvelocity.xyz",
-    color: "#111111",
+    color: "#ffc9b8",
     logo: "/executors/velocity.png",
   },
   {
