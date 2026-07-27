@@ -69,7 +69,7 @@ export const EXECUTORS: Executor[] = [
     price: "Free",
     status: "Updating",
     features: ["Quick inject", "Free forever", "Active Discord"],
-    website: "#",
+    website: "https://getvelocity.xyz",
     color: "#111111",
     logo: "/executors/velocity.png",
   },
