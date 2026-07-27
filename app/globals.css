@@ -1208,10 +1208,41 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   font-size: 12px; font-weight: 800; padding: 5px 10px; border-radius: 999px;
   border: 2px solid var(--line); box-shadow: 2px 2px 0 var(--line);
   font-family: "Fredoka", sans-serif;
+  white-space: nowrap;
+}
+.exec-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  max-width: 72%;
+}
+.exec-recommended {
+  background: #6eb6ff;
+  color: #fff;
+}
+.exec-card-recommended {
+  outline: 3px solid #6eb6ff;
 }
 .status-ok { background: #b8f5c8; color: #0d5c2e; }
 .status-warn { background: #ffe08a; color: #7a4d00; }
 .status-bad { background: #ffc9b8; color: #8a2200; }
+.exec-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+.exec-filter-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  background: #fffef8;
+  box-shadow: var(--shadow-sm);
+}
 .exec-card h3 { font-size: 24px; line-height: 1.1; }
 .exec-tagline { color: var(--ink-soft); font-weight: 700; line-height: 1.45; flex: 1; }
 .exec-meta { display: flex; flex-wrap: wrap; gap: 6px; }

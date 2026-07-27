@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Volt">
+  <rect width="64" height="64" rx="16" fill="#1a2f3d"/>
+  <path fill="#ffe08a" d="M34 8L18 36h12l-4 20 20-32H34l4-16z"/>
+</svg>
