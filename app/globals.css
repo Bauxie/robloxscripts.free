@@ -2001,6 +2001,7 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  margin: 0;
   padding: 8px 14px;
   border: 2px solid var(--line);
   border-radius: 999px;
