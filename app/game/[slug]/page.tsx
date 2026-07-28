@@ -6,6 +6,7 @@ import { enrichScriptViews } from "@/lib/thumbnails";
 import { gameMatchesSlug, slugifyGame } from "@/lib/games";
 import ScriptCard from "@/components/ScriptCard";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { timeAgo } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -17,14 +18,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const games = await listGameSlugs().catch(() => []);
   const match = games.find((g) => g.slug === slugifyGame(slug));
   const name = match?.name || slug.replace(/-/g, " ");
-  const title = `${name} Roblox scripts`;
-  const description = `Free ${name} scripts on ${SITE_NAME}. Browse, copy, and download community Lua scripts.`;
+  const title = `${name} Scripts`;
+  const description = `Browse and download free scripts for ${name} on Roblox. Working Lua scripts with executor compatibility votes, updated by the ${SITE_NAME} community.`;
   return {
     title,
     description,
-    keywords: [`${name} script`, `${name} roblox`, "roblox script", "free roblox script"],
+    keywords: [
+      `${name} script`,
+      `${name} scripts`,
+      `${name} script pastebin`,
+      `${name} roblox`,
+      "roblox script",
+      "free roblox script",
+    ],
     alternates: { canonical: `${SITE_URL}/game/${encodeURIComponent(slugifyGame(slug))}` },
-    openGraph: { title, description, url: `${SITE_URL}/game/${slugifyGame(slug)}` },
+    openGraph: {
+      title,
+      description,
+      url: `${SITE_URL}/game/${slugifyGame(slug)}`,
+      siteName: SITE_NAME,
+      type: "website",
+    },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -48,9 +63,52 @@ export default async function GamePage({ params }: PageProps) {
       .join(" ");
 
   const views = scripts.reduce((a, s) => a + (s.views || 0), 0);
+  const latest = scripts
+    .map((s) => s.updatedAt || s.createdAt)
+    .sort()
+    .pop();
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${displayName} Scripts`,
+    description: `Free ${displayName} scripts for Roblox — browse, copy, and download community Lua scripts.`,
+    url: `${SITE_URL}/game/${encodeURIComponent(slug)}`,
+    ...(latest ? { dateModified: new Date(latest).toISOString() } : {}),
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Scripts", item: `${SITE_URL}/scripts` },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: `${displayName} Scripts`,
+          item: `${SITE_URL}/game/${encodeURIComponent(slug)}`,
+        },
+      ],
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: scripts.length,
+      itemListElement: scripts.slice(0, 20).map((s, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: s.title,
+        url: `${SITE_URL}/script/${s.id}`,
+      })),
+    },
+  };
 
   return (
     <main className="app">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <Link href="/scripts" className="back-link">
         ← All scripts
       </Link>
@@ -61,8 +119,9 @@ export default async function GamePage({ params }: PageProps) {
             <span className="eyebrow">Game library</span>
             <h1>{displayName} scripts</h1>
             <p>
-              {scripts.length} script{scripts.length === 1 ? "" : "s"} · {views} views · Free
-              community uploads for {displayName}.
+              {scripts.length} script{scripts.length === 1 ? "" : "s"} · {views} views
+              {latest ? ` · Updated ${timeAgo(latest)}` : ""} · Free community uploads for{" "}
+              {displayName}.
             </p>
           </div>
           <Link

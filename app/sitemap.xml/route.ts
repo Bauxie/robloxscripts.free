@@ -48,23 +48,27 @@ export async function GET() {
 
   try {
     const scripts = await listScripts({ sort: "new" });
-    const games = new Set<string>();
+    const games = new Map<string, string>(); // slug -> latest update
 
     for (const s of scripts.slice(0, 5000)) {
+      const mod = new Date(s.updatedAt || s.createdAt).toISOString();
       urls.push(
         urlEntry(`${SITE}/script/${s.id}`, {
-          lastmod: new Date(s.updatedAt || s.createdAt).toISOString(),
+          lastmod: mod,
           changefreq: "daily",
           priority: "0.8",
         })
       );
       const slug = slugifyGame(s.game);
-      if (slug) games.add(slug);
+      if (slug && (!games.has(slug) || mod > (games.get(slug) as string))) {
+        games.set(slug, mod);
+      }
     }
 
-    for (const slug of games) {
+    for (const [slug, lastmod] of games) {
       urls.push(
         urlEntry(`${SITE}/game/${encodeURIComponent(slug)}`, {
+          lastmod,
           changefreq: "daily",
           priority: "0.75",
         })
