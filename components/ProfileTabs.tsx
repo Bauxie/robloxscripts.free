@@ -155,7 +155,7 @@ export default function ProfileTabs({
                   <Link href={`/script/${item.scriptId}`} className="profile-activity-script">
                     <div>
                       <strong>{item.scriptTitle}</strong>
-                      {item.scriptGame ? <span className="muted">🎮 {item.scriptGame}</span> : null}
+                      {item.scriptGame ? <span className="muted">{item.scriptGame}</span> : null}
                     </div>
                     <span>View conversation →</span>
                   </Link>

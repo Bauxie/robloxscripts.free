@@ -59,7 +59,7 @@ export default async function GamePage({ params }: PageProps) {
         <div className="section-head" style={{ marginTop: 0 }}>
           <div>
             <span className="eyebrow">Game library</span>
-            <h1>🎮 {displayName} scripts</h1>
+            <h1>{displayName} scripts</h1>
             <p>
               {scripts.length} script{scripts.length === 1 ? "" : "s"} · {views} views · Free
               community uploads for {displayName}.

@@ -204,7 +204,7 @@ export default function BeachHero({
                 href={gameHref(g.name)}
                 className="chip"
               >
-                🎮 {g.name}
+                {g.name}
                 <span className="chip-count">{g.count}</span>
               </Link>
             ))}

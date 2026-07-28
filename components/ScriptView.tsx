@@ -204,7 +204,7 @@ export default function ScriptView({
               {s.game ? (
                 <>
                   {" · "}
-                  <Link href={gameHref(s.game)}>🎮 {s.game}</Link>
+                  <Link href={gameHref(s.game)}>{s.game}</Link>
                 </>
               ) : null}
             </div>
@@ -320,7 +320,14 @@ export default function ScriptView({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={game.thumbnailUrl} alt={`${gameLabel} thumbnail`} width={120} height={120} />
               ) : (
-                <div className="play-game-fallback">🎮</div>
+                <div className="play-game-fallback" aria-hidden>
+                  <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 12h4M8 10v4" />
+                    <circle cx="15.5" cy="11" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="17.5" cy="13" r="1" fill="currentColor" stroke="none" />
+                    <path d="M17.32 5H6.68a4 4 0 0 0-3.96 3.44l-.89 6.24a2.34 2.34 0 0 0 4.03 1.9l2.29-2.44h7.7l2.29 2.44a2.34 2.34 0 0 0 4.03-1.9l-.89-6.24A4 4 0 0 0 17.32 5Z" />
+                  </svg>
+                </div>
               )}
             </div>
             <div className="play-game-copy">

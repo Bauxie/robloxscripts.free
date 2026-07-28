@@ -60,7 +60,7 @@ export default async function ScriptOgImage({ params }: { params: { id: string }
                 padding: "8px 20px",
               }}
             >
-              🎮 {game.length > 28 ? `${game.slice(0, 25)}…` : game}
+              {game.length > 28 ? `${game.slice(0, 25)}…` : game}
             </div>
           ) : null}
         </div>

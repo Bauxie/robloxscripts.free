@@ -37,15 +37,22 @@ export default function ScriptCard({
           <img src={s.thumbnailUrl} alt="" width={512} height={512} />
         ) : (
           <div className="card-media-fallback" aria-hidden>
-            🎮
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="8 6 3 12 8 18" />
+              <polyline points="16 6 21 12 16 18" />
+              <line x1="13.5" y1="4.5" x2="10.5" y2="19.5" />
+            </svg>
+            <span className="card-media-fallback-label">{s.title}</span>
           </div>
         )}
         {s.keySystem ? <span className="badge-key-system card-media-key">🔑 Key System</span> : null}
         {s.game ? (
           <div className="card-media-game" title={s.game}>
-            🎮 {s.game}
+            {s.game}
           </div>
-        ) : null}
+        ) : (
+          <div className="card-media-game card-media-game-none">Any game</div>
+        )}
       </Link>
 
       <div className="card-body">
