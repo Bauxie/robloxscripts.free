@@ -97,16 +97,6 @@ export default async function PublicProfilePage({ params, searchParams }: PagePr
               <SocialLinksRow
                 links={parseSocialLinks((profile as Record<string, unknown>).social_links)}
               />
-              <AchievementBadges
-                achievements={computeAchievements({
-                  scripts: scripts.length,
-                  views,
-                  likes,
-                  copies,
-                  followers: follows.followers,
-                  memberSince: String(profile.created_at || ""),
-                })}
-              />
 
               <p className="detail-sub">
                 Joined{" "}
@@ -134,6 +124,16 @@ export default async function PublicProfilePage({ params, searchParams }: PagePr
             )}
           </div>
         </div>
+        <AchievementBadges
+          achievements={computeAchievements({
+            scripts: scripts.length,
+            views,
+            likes,
+            copies,
+            followers: follows.followers,
+            memberSince: String(profile.created_at || ""),
+          })}
+        />
       </div>
 
       <ProfileTabs

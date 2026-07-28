@@ -2635,7 +2635,9 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 2px dashed rgba(26, 47, 61, 0.18);
 }
 .achievement-chip {
   display: inline-flex;
