@@ -32,7 +32,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     const admin = getAdminClient();
     const { data, error } = await admin
       .from("script_votes")
-      .select("executor_id, vote, user_id")
+      .select("executor_id, vote")
       .eq("script_id", params.id);
     if (error) return fail(error.message);
 
@@ -44,7 +44,8 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       else byExecutor[ex].broken += 1;
     }
 
-    return NextResponse.json({ votes: data || [], byExecutor });
+    // Aggregates only — never expose individual voter user_ids
+    return NextResponse.json({ byExecutor });
   } catch (e) {
     return fail(e);
   }

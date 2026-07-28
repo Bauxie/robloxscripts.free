@@ -5,6 +5,7 @@ import { listScripts, publicView } from "@/lib/store";
 import { enrichScriptViews } from "@/lib/thumbnails";
 import { createNotification } from "@/lib/notifications";
 import { profilePath } from "@/lib/profilePath";
+import { rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -59,16 +60,41 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
     if (!user) return fail("Login required.", 401);
 
+    const rl = await rateLimit({
+      key: `follow:${user.id}`,
+      limit: 30,
+      windowSeconds: 3600,
+    });
+    if (!rl.ok) return fail("Too many follows — try later.", 429);
+
     const body = await req.json();
     const followingId = String(body.userId || "").trim();
     if (!followingId) return fail("Missing userId.", 400);
     if (followingId === user.id) return fail("You can’t follow yourself.", 400);
+
+    // Confirm the target exists before writing / notifying
+    const { data: target } = await getAdminClient()
+      .from("profiles")
+      .select("id")
+      .eq("id", followingId)
+      .maybeSingle();
+    if (!target) return fail("User not found.", 404);
+
+    // Only notify on a NEW follow — repeat upserts must not re-notify
+    const { data: existing } = await supabase
+      .from("follows")
+      .select("follower_id")
+      .eq("follower_id", user.id)
+      .eq("following_id", followingId)
+      .maybeSingle();
 
     const { error } = await supabase.from("follows").upsert({
       follower_id: user.id,
       following_id: followingId,
     });
     if (error) return fail(error.message);
+
+    if (existing) return NextResponse.json({ ok: true, following: true });
 
     const { data: me } = await getAdminClient()
       .from("profiles")

@@ -1,7 +1,12 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { SOCIAL_PLATFORMS, SOCIAL_PLATFORM_META, type SocialLinks, type SocialPlatform } from "@/lib/profile";
 import { useToast } from "@/components/ToastProvider";
+import { fmtCompact } from "@/lib/format";
+
+type Stat = { label: string; value: number | string };
+type StatsPayload = { title?: string; stats: Stat[] };
 
 const ICONS: Record<SocialPlatform, JSX.Element> = {
   discord: (
@@ -36,10 +41,48 @@ const ICONS: Record<SocialPlatform, JSX.Element> = {
   ),
 };
 
+function StatsTooltip({ payload, loading }: { payload: StatsPayload | null; loading: boolean }) {
+  return (
+    <span className="social-tip" role="tooltip">
+      {loading ? (
+        <span className="social-tip-loading">Loading…</span>
+      ) : payload && (payload.title || payload.stats.length) ? (
+        <>
+          {payload.title ? <b className="social-tip-title">{payload.title}</b> : null}
+          {payload.stats.map((s) => (
+            <span key={s.label} className="social-tip-row">
+              <span>{s.label}</span>
+              <b>{typeof s.value === "number" ? fmtCompact(s.value) : s.value}</b>
+            </span>
+          ))}
+        </>
+      ) : (
+        <span className="social-tip-loading">No public stats</span>
+      )}
+    </span>
+  );
+}
+
 export default function SocialLinksRow({ links }: { links: SocialLinks }) {
   const toast = useToast();
+  const [stats, setStats] = useState<Partial<Record<SocialPlatform, StatsPayload | null>>>({});
+  const [hovered, setHovered] = useState<SocialPlatform | null>(null);
+  const requested = useRef(new Set<SocialPlatform>());
   const entries = SOCIAL_PLATFORMS.filter((p) => links[p]);
   if (!entries.length) return null;
+
+  function loadStats(platform: SocialPlatform, value: string) {
+    setHovered(platform);
+    if (requested.current.has(platform)) return;
+    requested.current.add(platform);
+    const qs = new URLSearchParams({ platform, v: value });
+    fetch(`/api/social/stats?${qs}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: StatsPayload | null) =>
+        setStats((s) => ({ ...s, [platform]: data && Array.isArray(data.stats) ? data : null }))
+      )
+      .catch(() => setStats((s) => ({ ...s, [platform]: null })));
+  }
 
   return (
     <div className="social-links" aria-label="Social links">
@@ -47,6 +90,17 @@ export default function SocialLinksRow({ links }: { links: SocialLinks }) {
         const value = links[platform] as string;
         const label = SOCIAL_PLATFORM_META[platform].label;
         const isUrl = value.startsWith("https://");
+        const payload = stats[platform];
+        const showTip = hovered === platform;
+        const tip = showTip ? (
+          <StatsTooltip payload={payload ?? null} loading={payload === undefined} />
+        ) : null;
+        const hoverProps = {
+          onMouseEnter: () => loadStats(platform, value),
+          onFocus: () => loadStats(platform, value),
+          onMouseLeave: () => setHovered((h) => (h === platform ? null : h)),
+          onBlur: () => setHovered((h) => (h === platform ? null : h)),
+        };
 
         if (!isUrl) {
           // Discord username — no profile URL exists, so copy on click
@@ -55,7 +109,8 @@ export default function SocialLinksRow({ links }: { links: SocialLinks }) {
               key={platform}
               type="button"
               className={`social-chip social-${platform}`}
-              title={`${label}: ${value} (click to copy)`}
+              aria-label={`${label}: ${value} (click to copy)`}
+              {...hoverProps}
               onClick={() => {
                 navigator.clipboard?.writeText(value);
                 toast(`Discord username copied: ${value}`);
@@ -63,6 +118,7 @@ export default function SocialLinksRow({ links }: { links: SocialLinks }) {
             >
               {ICONS[platform]}
               <span>{value}</span>
+              {tip}
             </button>
           );
         }
@@ -74,10 +130,12 @@ export default function SocialLinksRow({ links }: { links: SocialLinks }) {
             href={value}
             target="_blank"
             rel="noopener noreferrer nofollow ugc"
-            title={label}
+            aria-label={label}
+            {...hoverProps}
           >
             {ICONS[platform]}
             <span>{label}</span>
+            {tip}
           </a>
         );
       })}

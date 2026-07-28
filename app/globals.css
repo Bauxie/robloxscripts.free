@@ -2438,6 +2438,56 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
 .social-roblox svg { color: #1a2f3d; }
 .social-spotify svg { color: #1db954; }
 
+.social-chip { position: relative; }
+.social-tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 150px;
+  max-width: 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  z-index: 40;
+  cursor: default;
+  text-align: left;
+}
+.social-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--line);
+}
+.social-tip-title {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.social-tip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.social-tip-row b { color: var(--ink); }
+.social-tip-loading {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
 .social-edit-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
