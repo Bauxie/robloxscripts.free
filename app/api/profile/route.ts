@@ -114,6 +114,7 @@ export async function PATCH(req: NextRequest) {
       if (error.code === "23505") return fail("That username is already taken.", 409);
       return fail(error.message, 400);
     }
+    if (!data) return fail("Profile not found.", 404);
 
     // Keep denormalized author labels in sync
     if (usernameChanged && typeof updates.username === "string") {
