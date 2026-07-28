@@ -2478,7 +2478,7 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   .card, .exec-card, .how-step { border-radius: 22px; }
   .filters-row { flex-direction: column; align-items: stretch; }
   .filters-row input[type="text"],
-  .filters-row .select { width: 100%; min-width: 0; }
+  .filters-row .select { width: 100%; min-width: 0; flex: 0 0 auto; }
   .toolbar { flex-direction: column; align-items: stretch; }
   .toolbar .search { min-width: 0; width: 100%; }
   .toolbar .select { width: 100%; }
