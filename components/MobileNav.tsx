@@ -55,6 +55,7 @@ export default function MobileNav({ profile }: { profile: Profile | null }) {
         }}
       >
         <Link href="/scripts">Scripts</Link>
+        <Link href="/trending">Trending</Link>
         <Link href="/executors">Executors</Link>
         <a
           href="https://discord.gg/TaX9wg9seD"

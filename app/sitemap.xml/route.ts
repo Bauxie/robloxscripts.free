@@ -38,6 +38,7 @@ export async function GET() {
   const urls: string[] = [
     urlEntry(SITE, { changefreq: "hourly", priority: "1.0" }),
     urlEntry(`${SITE}/scripts`, { changefreq: "hourly", priority: "0.9" }),
+    urlEntry(`${SITE}/trending`, { changefreq: "hourly", priority: "0.8" }),
     urlEntry(`${SITE}/executors`, { changefreq: "weekly", priority: "0.6" }),
     urlEntry(`${SITE}/about`, { changefreq: "monthly", priority: "0.4" }),
     urlEntry(`${SITE}/contact`, { changefreq: "monthly", priority: "0.4" }),

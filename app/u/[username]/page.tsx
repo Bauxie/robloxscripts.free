@@ -16,6 +16,8 @@ import FollowButton from "@/components/FollowButton";
 import ReportButton from "@/components/ReportButton";
 import ProfileTabs, { type ProfileTabId } from "@/components/ProfileTabs";
 import SocialLinksRow from "@/components/SocialLinks";
+import AchievementBadges from "@/components/AchievementBadges";
+import { computeAchievements } from "@/lib/achievements";
 import { parseSocialLinks } from "@/lib/profile";
 import { getCurrentProfile } from "@/lib/auth";
 import { profilePath } from "@/lib/profilePath";
@@ -94,6 +96,16 @@ export default async function PublicProfilePage({ params, searchParams }: PagePr
               {profile.bio ? <p className="profile-bio">{profile.bio as string}</p> : null}
               <SocialLinksRow
                 links={parseSocialLinks((profile as Record<string, unknown>).social_links)}
+              />
+              <AchievementBadges
+                achievements={computeAchievements({
+                  scripts: scripts.length,
+                  views,
+                  likes,
+                  copies,
+                  followers: follows.followers,
+                  memberSince: String(profile.created_at || ""),
+                })}
               />
 
               <p className="detail-sub">
