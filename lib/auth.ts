@@ -1,6 +1,6 @@
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getAdminClient } from "@/lib/supabase/admin";
-import { normalizeUsername, type Profile } from "@/lib/profile";
+import { normalizeUsername, parseSocialLinks, type Profile } from "@/lib/profile";
 import { normalizeRoles, withBootstrapOwner } from "@/lib/roles";
 
 export type { Profile } from "@/lib/profile";
@@ -13,7 +13,7 @@ export {
 } from "@/lib/profile";
 
 const PROFILE_SELECT =
-  "id, username, avatar_url, bio, created_at, username_changed_at, roles";
+  "id, username, avatar_url, bio, created_at, username_changed_at, roles, social_links";
 const PROFILE_SELECT_FALLBACK = "id, username, avatar_url, created_at";
 
 function isMissingColumnError(error: { message?: string; code?: string } | null): boolean {
@@ -37,6 +37,7 @@ function mapProfile(row: Record<string, unknown>): Profile {
     created_at: String(row.created_at),
     username_changed_at: (row.username_changed_at as string | null) || null,
     roles: normalizeRoles(row.roles),
+    social_links: parseSocialLinks(row.social_links),
   };
   return {
     ...base,

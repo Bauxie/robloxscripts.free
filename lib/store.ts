@@ -492,6 +492,14 @@ export async function readScripts(): Promise<ScriptRecord[]> {
 
 export async function getProfileByUsername(username: string) {
   const admin = getAdminClient();
+  const full = await admin
+    .from("profiles")
+    .select("id, username, avatar_url, bio, created_at, roles, social_links")
+    .ilike("username", username)
+    .maybeSingle();
+  if (!full.error) return full.data;
+
+  // Fallback if the social_links migration hasn't been run yet
   const { data, error } = await admin
     .from("profiles")
     .select("id, username, avatar_url, bio, created_at, roles")

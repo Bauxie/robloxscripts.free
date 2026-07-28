@@ -15,6 +15,8 @@ import RoleBadges from "@/components/RoleBadges";
 import FollowButton from "@/components/FollowButton";
 import ReportButton from "@/components/ReportButton";
 import ProfileTabs, { type ProfileTabId } from "@/components/ProfileTabs";
+import SocialLinksRow from "@/components/SocialLinks";
+import { parseSocialLinks } from "@/lib/profile";
 import { getCurrentProfile } from "@/lib/auth";
 import { profilePath } from "@/lib/profilePath";
 
@@ -90,6 +92,10 @@ export default async function PublicProfilePage({ params, searchParams }: PagePr
                 <RoleBadges roles={roles} size="lg" />
               </div>
               {profile.bio ? <p className="profile-bio">{profile.bio as string}</p> : null}
+              <SocialLinksRow
+                links={parseSocialLinks((profile as Record<string, unknown>).social_links)}
+              />
+
               <p className="detail-sub">
                 Joined{" "}
                 {profile.created_at

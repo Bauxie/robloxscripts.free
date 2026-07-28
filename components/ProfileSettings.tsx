@@ -4,11 +4,15 @@ import { FormEvent, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/profile";
 import {
+  SOCIAL_PLATFORMS,
+  SOCIAL_PLATFORM_META,
   USERNAME_COOLDOWN_DAYS,
   formatCooldown,
+  normalizeSocialLink,
   normalizeUsername,
   usernameCooldownRemaining,
   validateUsername,
+  type SocialPlatform,
 } from "@/lib/profile";
 import { useToast } from "@/components/ToastProvider";
 import AvatarCropModal from "@/components/AvatarCropModal";
@@ -20,6 +24,11 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
 
   const [username, setUsername] = useState(profile.username);
   const [bio, setBio] = useState(profile.bio || "");
+  const [social, setSocial] = useState<Record<SocialPlatform, string>>(() => {
+    const init = {} as Record<SocialPlatform, string>;
+    for (const p of SOCIAL_PLATFORMS) init[p] = profile.social_links?.[p] || "";
+    return init;
+  });
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -37,6 +46,15 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
     const invalid = validateUsername(nextUser);
     if (invalid) return setError(invalid);
 
+    const nextSocial: Record<string, string> = {};
+    for (const p of SOCIAL_PLATFORMS) {
+      const { value, error: linkError } = normalizeSocialLink(p, social[p]);
+      if (linkError) {
+        return setError(`${SOCIAL_PLATFORM_META[p].label}: ${linkError}`);
+      }
+      nextSocial[p] = value || "";
+    }
+
     setBusy(true);
     try {
       const res = await fetch("/api/profile", {
@@ -45,6 +63,7 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
         body: JSON.stringify({
           username: nextUser,
           bio,
+          social: nextSocial,
         }),
       });
       const data = await res.json();
@@ -52,6 +71,13 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
       toast("Profile updated ✨");
       setUsername(data.profile.username);
       setBio(data.profile.bio || "");
+      if (data.profile.social_links) {
+        setSocial(() => {
+          const next = {} as Record<SocialPlatform, string>;
+          for (const p of SOCIAL_PLATFORMS) next[p] = data.profile.social_links[p] || "";
+          return next;
+        });
+      }
       router.refresh();
     } catch (err) {
       setError((err as Error).message);
@@ -207,6 +233,26 @@ export default function ProfileSettings({ profile }: { profile: Profile }) {
               disabled={busy}
             />
             <div className="hint">{bio.length}/160</div>
+          </div>
+
+          <div>
+            <label>Social links</label>
+            <div className="social-edit-grid">
+              {SOCIAL_PLATFORMS.map((p) => (
+                <div key={p} className="social-edit-field">
+                  <span className="social-edit-label">{SOCIAL_PLATFORM_META[p].label}</span>
+                  <input
+                    type="text"
+                    value={social[p]}
+                    onChange={(e) => setSocial((s) => ({ ...s, [p]: e.target.value }))}
+                    placeholder={SOCIAL_PLATFORM_META[p].placeholder}
+                    maxLength={200}
+                    disabled={busy}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="hint">Paste a profile URL or just your handle. Leave blank to hide.</div>
           </div>
 
           {error ? <p className="form-error">{error}</p> : null}

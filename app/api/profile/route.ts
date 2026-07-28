@@ -8,6 +8,12 @@ import {
   usernameCooldownRemaining,
   validateUsername,
 } from "@/lib/auth";
+import {
+  SOCIAL_PLATFORMS,
+  SOCIAL_PLATFORM_META,
+  normalizeSocialLink,
+  type SocialLinks,
+} from "@/lib/profile";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,6 +41,20 @@ export async function PATCH(req: NextRequest) {
 
     if (typeof body.bio === "string") {
       updates.bio = body.bio.trim().slice(0, 160);
+    }
+
+    if (body.social && typeof body.social === "object") {
+      const next: SocialLinks = {};
+      for (const platform of SOCIAL_PLATFORMS) {
+        const raw = (body.social as Record<string, unknown>)[platform];
+        if (typeof raw !== "string") continue;
+        const { value, error } = normalizeSocialLink(platform, raw);
+        if (error) {
+          return fail(`${SOCIAL_PLATFORM_META[platform].label}: ${error}`, 400);
+        }
+        if (value) next[platform] = value;
+      }
+      updates.social_links = next;
     }
 
     if (typeof body.username === "string") {
@@ -70,12 +90,25 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ profile });
     }
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("profiles")
       .update(updates)
       .eq("id", profile.id)
-      .select("id, username, avatar_url, bio, created_at, username_changed_at")
+      .select("id, username, avatar_url, bio, created_at, username_changed_at, social_links")
       .single();
+
+    // Fallback if the social_links migration hasn't been run yet
+    if (error && "social_links" in updates && /social_links|schema cache/i.test(error.message)) {
+      delete updates.social_links;
+      if (Object.keys(updates).length) {
+        ({ data, error } = await supabase
+          .from("profiles")
+          .update(updates)
+          .eq("id", profile.id)
+          .select("id, username, avatar_url, bio, created_at, username_changed_at")
+          .single());
+      }
+    }
 
     if (error) {
       if (error.code === "23505") return fail("That username is already taken.", 409);
@@ -96,6 +129,7 @@ export async function PATCH(req: NextRequest) {
         ...data,
         bio: data.bio || "",
         username_changed_at: data.username_changed_at || null,
+        social_links: data.social_links || {},
       },
     });
   } catch (e) {

@@ -2398,6 +2398,61 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   .detail-cta button { flex: 1 1 100%; }
 }
 
+/* ---------------- Social links ---------------- */
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.social-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.social-chip:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--line);
+}
+.social-chip svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+.social-discord svg { color: #5865f2; }
+.social-youtube svg { color: #ff0000; }
+.social-github svg { color: #1a2f3d; }
+.social-gitlab svg { color: #fc6d26; }
+.social-roblox svg { color: #1a2f3d; }
+.social-spotify svg { color: #1db954; }
+
+.social-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.social-edit-field { display: flex; flex-direction: column; gap: 4px; }
+.social-edit-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+@media (max-width: 640px) {
+  .social-edit-grid { grid-template-columns: 1fr; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; }
   .nav-links { transition: none; }
