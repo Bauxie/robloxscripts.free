@@ -21,6 +21,13 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
     const script = await getScript(params.id);
     if (!script) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+    if (script.userId && script.userId === user.id) {
+      return NextResponse.json(
+        { error: "You can’t like your own script." },
+        { status: 400 }
+      );
+    }
+
     const { error: likeError } = await supabase.from("script_likes").insert({
       script_id: params.id,
       user_id: user.id,

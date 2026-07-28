@@ -63,6 +63,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     } = await supabase.auth.getUser();
     if (!user) return fail("Login required.", 401);
 
+    // Burst control: max 1 comment per 15s, 20 per hour
+    const burst = await rateLimit({
+      key: `comment-burst:${user.id}`,
+      limit: 1,
+      windowSeconds: 15,
+    });
+    if (!burst.ok) return fail("You’re commenting too fast — wait a moment.", 429);
+
     const rl = await rateLimit({
       key: `comment:${user.id}`,
       limit: 20,
@@ -77,6 +85,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const text = String(body.body || "").trim();
     if (text.length < 1 || text.length > 1000) {
       return fail("Comment must be 1–1000 characters.", 400);
+    }
+
+    // Link spam: cap URLs per comment
+    const linkCount = (text.match(/https?:\/\/|www\.|discord\.gg\//gi) || []).length;
+    if (linkCount > 2) return fail("Too many links in one comment.", 400);
+
+    // Duplicate spam: same text posted anywhere by this user in the last 10 min
+    const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { data: recent } = await getAdminClient()
+      .from("comments")
+      .select("body")
+      .eq("user_id", user.id)
+      .gte("created_at", since)
+      .limit(10);
+    const normalized = text.replace(/\s+/g, " ").toLowerCase();
+    if ((recent || []).some((c) => String(c.body || "").replace(/\s+/g, " ").toLowerCase() === normalized)) {
+      return fail("You just posted that — duplicate comments are blocked.", 400);
     }
 
     const id = nanoid(12);

@@ -67,13 +67,12 @@ export default function ScriptCard({
           </h3>
           <p className="desc">{s.description || "No description provided."}</p>
         </Link>
-        {(s.featured || s.staffVerified || s.keySystem) && (
+        {(s.featured || s.staffVerified) && (
           <div className="script-badges">
             {s.featured ? <span className="badge-featured">★ Featured</span> : null}
             {s.staffVerified ? (
               <span className="badge-verified-script">Staff verified</span>
             ) : null}
-            {s.keySystem ? <span className="badge-key-system">🔑 Key System</span> : null}
           </div>
         )}
         {s.game ? (

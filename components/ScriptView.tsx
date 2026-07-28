@@ -240,14 +240,16 @@ export default function ScriptView({
             <button type="button" className="btn btn-primary" onClick={copy}>
               📋 Copy script
             </button>
-            <button
-              type="button"
-              className={`btn btn-ghost${liked ? " is-liked" : ""}`}
-              onClick={like}
-              disabled={liked}
-            >
-              {liked ? "❤️ Liked" : "🤍 Like"}
-            </button>
+            {!canEdit ? (
+              <button
+                type="button"
+                className={`btn btn-ghost${liked ? " is-liked" : ""}`}
+                onClick={like}
+                disabled={liked}
+              >
+                {liked ? "❤️ Liked" : "🤍 Like"}
+              </button>
+            ) : null}
             <a className="btn btn-ghost" href={`/api/scripts/${s.id}/raw`}>
               ⬇ Download .lua
             </a>

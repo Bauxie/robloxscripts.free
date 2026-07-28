@@ -80,7 +80,7 @@ export default async function ScriptPage({ params }: PageProps) {
   const canComment = Boolean(me);
   const canReport = Boolean(me && (!record.userId || me.id !== record.userId));
   const canFavorite = Boolean(me);
-  const canVote = Boolean(me);
+  const canVote = Boolean(me && (!record.userId || me.id !== record.userId));
   const canModerateScript = Boolean(me && canModerate(me.roles));
 
   return (

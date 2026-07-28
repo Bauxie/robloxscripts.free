@@ -14,7 +14,6 @@ export default async function Nav() {
   return (
     <header className="nav">
       <div className="nav-left">
-        <NavSearch />
         <Link className="brand" href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="brand-mark" src="/logo.png" alt="RS" width={42} height={42} />
@@ -22,6 +21,7 @@ export default async function Nav() {
             robloxscripts.<b>free</b>
           </span>
         </Link>
+        <NavSearch />
       </div>
       <MobileNav profile={profile} />
     </header>

@@ -62,6 +62,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const script = await getScript(params.id);
     if (!script) return fail("Script not found", 404);
 
+    if (script.userId && script.userId === user.id) {
+      return fail("You can’t vote on your own script.", 400);
+    }
+
     const rl = await rateLimit({
       key: `vote:${user.id}`,
       limit: 40,

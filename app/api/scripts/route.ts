@@ -9,7 +9,7 @@ import {
   MAX_CODE,
   type ScriptRecord,
 } from "@/lib/store";
-import { getSupabaseConfigError } from "@/lib/supabase/admin";
+import { getAdminClient, getSupabaseConfigError } from "@/lib/supabase/admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { parsePlaceId, getPlaceName } from "@/lib/roblox";
 import { rateLimit } from "@/lib/rateLimit";
@@ -147,6 +147,25 @@ export async function POST(req: NextRequest) {
     if (!title) return fail("A title is required.", 400);
     if (!code.trim()) return fail("Script code is required.", 400);
     if (code.length > MAX_CODE) return fail("Script is too large (max 500 KB).", 400);
+
+    // Anti-spam: block re-uploading the same title or identical code within 24h
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: recentUploads } = await getAdminClient()
+      .from("scripts")
+      .select("title, code")
+      .eq("user_id", user.id)
+      .gte("created_at", since)
+      .limit(10);
+    const titleNorm = title.toLowerCase();
+    const codeNorm = code.trim();
+    for (const r of recentUploads || []) {
+      if (String(r.title || "").toLowerCase() === titleNorm) {
+        return fail("You already uploaded a script with this title today.", 409);
+      }
+      if (String(r.code || "").trim() === codeNorm) {
+        return fail("You already uploaded this exact script today.", 409);
+      }
+    }
 
     const scanHits = scanScriptCode(code);
     const now = new Date().toISOString();
