@@ -130,11 +130,19 @@ export async function POST(req: NextRequest) {
     title = title.trim();
     description = description.trim().slice(0, 2000);
 
-    const gamePlaceId = parsePlaceId(gameLink);
-    if (gameLink.trim() && !gamePlaceId) {
-      return fail("Game link must be a Roblox games URL or place ID.", 400);
-    }
+    const { validateUploadFields, firstUploadError } = await import("@/lib/uploadValidation");
 
+    const fieldErrors = validateUploadFields({
+      title,
+      description,
+      gameLink,
+      code,
+      executors: sanitizeExecutors(executorsRaw),
+    });
+    const first = firstUploadError(fieldErrors);
+    if (first) return fail(first, 400);
+
+    const gamePlaceId = parsePlaceId(gameLink);
     let game = "";
     if (gamePlaceId) {
       const fetched = await getPlaceName(gamePlaceId);
@@ -143,10 +151,6 @@ export async function POST(req: NextRequest) {
 
     const tags = sanitizeTags(tagsRaw, game);
     const executors = sanitizeExecutors(executorsRaw);
-
-    if (!title) return fail("A title is required.", 400);
-    if (!code.trim()) return fail("Script code is required.", 400);
-    if (code.length > MAX_CODE) return fail("Script is too large (max 500 KB).", 400);
 
     // Anti-spam: block re-uploading the same title or identical code within 24h
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();

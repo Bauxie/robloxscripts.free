@@ -942,6 +942,26 @@ textarea.code-input {
 
 .form-actions { display: flex; gap: 12px; align-items: center; justify-content: flex-end; margin-top: 6px; flex-wrap: wrap; }
 .form-error { color: #c8300f; font-weight: 800; margin-right: auto; }
+.field-error {
+  margin: 8px 0 0;
+  color: #c8300f;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.field-meta {
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.field-meta.is-short { color: #b45309; }
+.field-invalid input,
+.field-invalid textarea,
+.field-invalid .executor-picker {
+  border-color: #e24b2a !important;
+  box-shadow: 3px 3px 0 rgba(226, 75, 42, 0.25);
+}
 
 /* ---------- Detail view ---------- */
 .detail-head { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: start; margin-bottom: 20px; }
