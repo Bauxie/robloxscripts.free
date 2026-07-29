@@ -29,6 +29,8 @@ function likeKey(id: string) {
   return `liked:${id}`;
 }
 
+const HIDE_COMPAT_PROMPT_KEY = "rs_hide_compat_prompt";
+
 export default function ScriptView({
   s,
   game,
@@ -89,7 +91,13 @@ export default function ScriptView({
       await navigator.clipboard.writeText(s.code || "");
       toast("Copied to clipboard! 📋");
       fetch(`/api/scripts/${s.id}/copy`, { method: "POST" }).catch(() => {});
-      setCompatOpen(true);
+      try {
+        if (localStorage.getItem(HIDE_COMPAT_PROMPT_KEY) !== "1") {
+          setCompatOpen(true);
+        }
+      } catch {
+        setCompatOpen(true);
+      }
     } catch {
       toast("Copy failed — select manually", true);
     }
@@ -394,6 +402,14 @@ export default function ScriptView({
           initialBroken={s.brokenCount}
           open={compatOpen}
           onClose={() => setCompatOpen(false)}
+          onNeverShow={() => {
+            try {
+              localStorage.setItem(HIDE_COMPAT_PROMPT_KEY, "1");
+            } catch {
+              // ignore
+            }
+            setCompatOpen(false);
+          }}
         />
 
         <CommentsSection scriptId={s.id} canComment={canComment} />

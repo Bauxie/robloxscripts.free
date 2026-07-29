@@ -78,13 +78,8 @@ function CompatVoteBody({
 
   return (
     <>
-      <div className="compat-head">
-        <strong>Does it work?</strong>
-        <span className="hint">
-          {works} working · {broken} broken overall
-        </span>
-      </div>
-      <div className="compat-controls">
+      <label className="compat-executor">
+        <span>Which executor did you use?</span>
         <select
           className="select"
           value={executorId}
@@ -96,18 +91,32 @@ function CompatVoteBody({
             </option>
           ))}
         </select>
-        <button type="button" className="btn btn-primary btn-sm" onClick={() => vote("works")}>
-          Works
+      </label>
+      <div className="compat-choice-grid">
+        <button
+          type="button"
+          className="compat-choice compat-choice-works"
+          onClick={() => vote("works")}
+        >
+          <span className="compat-choice-icon" aria-hidden>🔥</span>
+          <strong>Works Great</strong>
+          <span>Hot Script</span>
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => vote("broken")}>
-          Broken
+        <button
+          type="button"
+          className="compat-choice compat-choice-broken"
+          onClick={() => vote("broken")}
+        >
+          <span className="compat-choice-icon" aria-hidden>🥶</span>
+          <strong>Not Working</strong>
+          <span>Cold Script</span>
         </button>
       </div>
-      {stats ? (
-        <p className="hint" style={{ marginTop: 8 }}>
-          On this executor: {stats.works} works · {stats.broken} broken
-        </p>
-      ) : null}
+      <p className="compat-stats hint">
+        {stats
+          ? `On this executor: ${stats.works} works · ${stats.broken} broken`
+          : `${works} working · ${broken} broken overall`}
+      </p>
     </>
   );
 }
@@ -119,6 +128,7 @@ export default function CompatVotes({
   initialBroken = 0,
   open = false,
   onClose,
+  onNeverShow,
 }: {
   scriptId: string;
   canVote: boolean;
@@ -126,6 +136,7 @@ export default function CompatVotes({
   initialBroken?: number;
   open?: boolean;
   onClose?: () => void;
+  onNeverShow?: () => void;
 }) {
   if (!open) return null;
 
@@ -134,20 +145,28 @@ export default function CompatVotes({
       className="crop-modal"
       role="dialog"
       aria-modal="true"
-      aria-label="Does it work?"
+      aria-labelledby="compat-title"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose?.();
       }}
     >
       <div className="crop-modal-panel compat-modal-panel">
-        <div className="section-head" style={{ marginTop: 0 }}>
+        <button
+          type="button"
+          className="compat-close"
+          aria-label="Close"
+          onClick={onClose}
+        >
+          ×
+        </button>
+        <div className="compat-modal-head">
+          <span className="compat-modal-icon" aria-hidden>💬</span>
           <div>
-            <span className="eyebrow">Copied</span>
-            <h2>Does it work?</h2>
-            <p>After you try it, tell others if this script runs on your executor.</p>
+            <h2 id="compat-title">Did this script work?</h2>
+            <p>Help the community discover reliable scripts by sharing your experience.</p>
           </div>
         </div>
-        <div className="compat-votes compat-votes-modal">
+        <div className="compat-votes-modal">
           <CompatVoteBody
             scriptId={scriptId}
             canVote={canVote}
@@ -156,10 +175,19 @@ export default function CompatVotes({
             onVoted={onClose}
           />
         </div>
-        <div className="form-actions" style={{ marginTop: 16 }}>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
-            Maybe later
+        <div className="compat-skip">
+          <button type="button" onClick={onClose}>
+            Skip feedback
           </button>
+          <label>
+            <input
+              type="checkbox"
+              onChange={(event) => {
+                if (event.target.checked) onNeverShow?.();
+              }}
+            />
+            Don&apos;t show this again
+          </label>
         </div>
       </div>
     </div>
