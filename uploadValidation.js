@@ -156,6 +156,48 @@ export function validateUpload(payload = {}) {
   return { valid: Object.keys(errors).length === 0, errors, cleaned };
 }
 
+/**
+ * Standing help text — shown under every field before the user makes a mistake.
+ * Prevention beats correction. These never change; they state the rule.
+ */
+export const FIELD_HELP = {
+  title: 'Name the game and what the script does. 3–80 characters.',
+  gameName: 'Optional. Leave blank if the script works across games.',
+  description: `At least ${RULES.DESCRIPTION_MIN} characters and ${RULES.DESCRIPTION_MIN_WORDS} words. Say what it does, not that it works.`,
+  tags: `Pick at least ${RULES.TAGS_MIN} tag so people can find it.`,
+  executors: `Select the ${RULES.EXECUTORS_MIN}+ executors you actually tested on.`,
+  source: 'Paste the full script or the loader line. Comments alone are rejected.',
+};
+
+/** Human labels for the error summary banner. */
+export const FIELD_LABELS = {
+  title: 'Title',
+  description: 'Description',
+  tags: 'Tags',
+  executors: 'Tested executors',
+  source: 'Script',
+};
+
+/** Render order — the summary lists failures top-to-bottom as they appear in the form. */
+export const FIELD_ORDER = ['title', 'description', 'tags', 'executors', 'source'];
+
+/**
+ * Turns the errors object into an ordered list for the summary banner.
+ * Returns [{ field, label, message }] in form order, not object-key order.
+ */
+export function summarizeErrors(errors = {}) {
+  return FIELD_ORDER.filter((field) => errors[field]).map((field) => ({
+    field,
+    label: FIELD_LABELS[field],
+    message: errors[field],
+  }));
+}
+
+/** The first field that failed, in form order. This is what gets focus. */
+export function firstInvalidField(errors = {}) {
+  return FIELD_ORDER.find((field) => errors[field]) ?? null;
+}
+
 /** Live counter state for the description field — drives the UI hint. */
 export function descriptionProgress(raw) {
   const length = clean(raw).length;
