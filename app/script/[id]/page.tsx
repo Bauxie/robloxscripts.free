@@ -100,6 +100,7 @@ export default async function ScriptPage({ params }: PageProps) {
         canReport={canReport}
         canFavorite={canFavorite}
         canVote={canVote}
+        loggedIn={Boolean(me)}
         canModerateScript={canModerateScript}
       />
     </>

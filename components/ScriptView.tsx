@@ -40,6 +40,7 @@ export default function ScriptView({
   canReport = false,
   canFavorite = false,
   canVote = false,
+  loggedIn = false,
   canModerateScript = false,
 }: {
   s: ScriptViewType;
@@ -50,6 +51,7 @@ export default function ScriptView({
   canReport?: boolean;
   canFavorite?: boolean;
   canVote?: boolean;
+  loggedIn?: boolean;
   canModerateScript?: boolean;
 }) {
   const toast = useToast();
@@ -398,6 +400,7 @@ export default function ScriptView({
         <CompatVotes
           scriptId={s.id}
           canVote={canVote}
+          loggedIn={loggedIn}
           initialWorks={s.worksCount}
           initialBroken={s.brokenCount}
           open={compatOpen}

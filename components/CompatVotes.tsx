@@ -7,12 +7,14 @@ import { useToast } from "@/components/ToastProvider";
 function CompatVoteBody({
   scriptId,
   canVote,
+  loggedIn,
   initialWorks = 0,
   initialBroken = 0,
   onVoted,
 }: {
   scriptId: string;
   canVote: boolean;
+  loggedIn: boolean;
   initialWorks?: number;
   initialBroken?: number;
   onVoted?: () => void;
@@ -43,8 +45,12 @@ function CompatVoteBody({
   }, [scriptId]);
 
   async function vote(v: "works" | "broken") {
-    if (!canVote) {
+    if (!loggedIn) {
       toast("Log in to vote", true);
+      return;
+    }
+    if (!canVote) {
+      toast("You can’t vote on your own script.", true);
       return;
     }
     try {
@@ -100,7 +106,6 @@ function CompatVoteBody({
         >
           <span className="compat-choice-icon" aria-hidden>🔥</span>
           <strong>Works Great</strong>
-          <span>Hot Script</span>
         </button>
         <button
           type="button"
@@ -109,7 +114,6 @@ function CompatVoteBody({
         >
           <span className="compat-choice-icon" aria-hidden>🥶</span>
           <strong>Not Working</strong>
-          <span>Cold Script</span>
         </button>
       </div>
       <p className="compat-stats hint">
@@ -124,6 +128,7 @@ function CompatVoteBody({
 export default function CompatVotes({
   scriptId,
   canVote,
+  loggedIn = false,
   initialWorks = 0,
   initialBroken = 0,
   open = false,
@@ -132,6 +137,7 @@ export default function CompatVotes({
 }: {
   scriptId: string;
   canVote: boolean;
+  loggedIn?: boolean;
   initialWorks?: number;
   initialBroken?: number;
   open?: boolean;
@@ -170,6 +176,7 @@ export default function CompatVotes({
           <CompatVoteBody
             scriptId={scriptId}
             canVote={canVote}
+            loggedIn={loggedIn}
             initialWorks={initialWorks}
             initialBroken={initialBroken}
             onVoted={onClose}

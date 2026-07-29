@@ -2422,11 +2422,6 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   font-family: "Fredoka", sans-serif;
   font-size: 21px;
 }
-.compat-choice > span:last-child {
-  margin-top: 4px;
-  color: var(--ink-soft);
-  font-weight: 800;
-}
 .compat-stats {
   margin: 12px 0 0;
   text-align: center;
