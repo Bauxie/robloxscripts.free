@@ -7,6 +7,8 @@ import {
   summarizeErrors,
   firstInvalidField,
   descriptionProgress,
+  sourceProgress,
+  selectionProgress,
 } from './uploadValidation';
 
 const TAG_OPTIONS = [
@@ -37,6 +39,9 @@ export default function UploadForm({ onSubmit }) {
 
   const { valid, errors, cleaned } = useMemo(() => validateUpload(form), [form]);
   const desc = descriptionProgress(form.description);
+  const src = sourceProgress(form.source);
+  const tagCount = selectionProgress(form.tags, RULES.TAGS_MIN);
+  const execCount = selectionProgress(form.executors, RULES.EXECUTORS_MIN);
   const summary = summarizeErrors(errors);
 
   const register = (key) => (node) => {
@@ -150,7 +155,11 @@ export default function UploadForm({ onSubmit }) {
         required
         help={FIELD_HELP.description}
         error={errorFor('description')}
-        hint={desc.met ? `${desc.length}/${RULES.DESCRIPTION_MAX}` : `${desc.remaining} more needed`}
+        hint={
+          desc.met
+            ? `✓ ${desc.length}/${RULES.DESCRIPTION_MAX}`
+            : `${desc.remaining} more character${desc.remaining === 1 ? '' : 's'} needed`
+        }
         hintTone={desc.met ? 'ok' : 'pending'}
       >
         {(a11y) => (
@@ -176,8 +185,8 @@ export default function UploadForm({ onSubmit }) {
         required
         help={FIELD_HELP.tags}
         error={errorFor('tags')}
-        hint={`${form.tags.length} selected`}
-        hintTone={form.tags.length >= RULES.TAGS_MIN ? 'ok' : 'pending'}
+        hint={tagCount.met ? `✓ ${tagCount.count} selected` : `Select ${tagCount.remaining} tag`}
+        hintTone={tagCount.met ? 'ok' : 'pending'}
       >
         {(a11y) => (
           <ChipGroup
@@ -201,8 +210,12 @@ export default function UploadForm({ onSubmit }) {
         required
         help={FIELD_HELP.executors}
         error={errorFor('executors')}
-        hint={`${form.executors.length} of ${RULES.EXECUTORS_MIN} minimum`}
-        hintTone={form.executors.length >= RULES.EXECUTORS_MIN ? 'ok' : 'pending'}
+        hint={
+          execCount.met
+            ? `✓ ${execCount.count} selected`
+            : `Select ${execCount.remaining} more executor${execCount.remaining === 1 ? '' : 's'}`
+        }
+        hintTone={execCount.met ? 'ok' : 'pending'}
       >
         {(a11y) => (
           <ChipGroup
@@ -226,8 +239,12 @@ export default function UploadForm({ onSubmit }) {
         required
         help={FIELD_HELP.source}
         error={errorFor('source')}
-        hint={form.source.trim() ? `${form.source.length.toLocaleString()} characters` : 'Empty'}
-        hintTone={form.source.trim().length >= RULES.SOURCE_MIN ? 'ok' : 'pending'}
+        hint={
+          src.met
+            ? `✓ ${src.length.toLocaleString()} characters`
+            : `${src.remaining} more character${src.remaining === 1 ? '' : 's'} needed`
+        }
+        hintTone={src.met ? 'ok' : 'pending'}
       >
         {(a11y) => (
           <textarea

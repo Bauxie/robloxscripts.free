@@ -210,3 +210,26 @@ export function descriptionProgress(raw) {
     over: length > RULES.DESCRIPTION_MAX,
   };
 }
+
+/** Same countdown shape for the script paste box. */
+export function sourceProgress(raw) {
+  const length = typeof raw === 'string' ? raw.trim().length : 0;
+  return {
+    length,
+    min: RULES.SOURCE_MIN,
+    remaining: Math.max(0, RULES.SOURCE_MIN - length),
+    met: length >= RULES.SOURCE_MIN,
+    over: length > RULES.SOURCE_MAX,
+  };
+}
+
+/** Countdown for any multi-select field. Drives the tag and executor hints. */
+export function selectionProgress(list, min) {
+  const count = Array.isArray(list) ? new Set(list.filter(Boolean)).size : 0;
+  return {
+    count,
+    min,
+    remaining: Math.max(0, min - count),
+    met: count >= min,
+  };
+}
