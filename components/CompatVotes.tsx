@@ -183,9 +183,6 @@ export default function CompatVotes({
           />
         </div>
         <div className="compat-skip">
-          <button type="button" onClick={onClose}>
-            Skip feedback
-          </button>
           <label>
             <input
               type="checkbox"

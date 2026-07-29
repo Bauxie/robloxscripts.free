@@ -2432,13 +2432,6 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   gap: 13px;
   margin-top: 20px;
 }
-.compat-skip button {
-  border: 0;
-  background: transparent;
-  color: var(--ink-soft);
-  font-weight: 900;
-  cursor: pointer;
-}
 .compat-skip label {
   display: flex;
   gap: 8px;
