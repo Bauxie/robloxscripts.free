@@ -7,7 +7,6 @@ import { fmtBytes } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
 import TagInput from "@/components/TagInput";
 import ExecutorPicker from "@/components/ExecutorPicker";
-import { EXECUTORS } from "@/lib/executors";
 import {
   CODE_MAX,
   CODE_MIN,
@@ -79,7 +78,8 @@ export default function UploadPage({ username }: { username: string }) {
     const errors = runValidation();
     const first = firstUploadError(errors);
     if (first) {
-      setError(first);
+      const count = Object.keys(errors).length;
+      setError(`Fix ${count} field${count === 1 ? "" : "s"} highlighted above to publish.`);
       toast(first, true);
       const el = document.querySelector(".field-invalid");
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -172,14 +172,15 @@ export default function UploadPage({ username }: { username: string }) {
               }}
               aria-invalid={Boolean(touched && fieldErrors.title)}
             />
-            <div className={`field-meta${titleLen < TITLE_MIN ? " is-short" : ""}`}>
-              {titleLen}/{TITLE_MAX} · minimum {TITLE_MIN} characters
-            </div>
             {touched && fieldErrors.title ? (
               <p className="field-error" role="alert">
                 {fieldErrors.title}
               </p>
-            ) : null}
+            ) : (
+              <div className={`field-meta${titleLen < TITLE_MIN ? " is-short" : ""}`}>
+                {titleLen}/{TITLE_MAX} · minimum {TITLE_MIN} characters
+              </div>
+            )}
           </div>
 
           <div className={touched && fieldErrors.gameLink ? "field-invalid" : undefined}>
@@ -196,31 +197,28 @@ export default function UploadPage({ username }: { username: string }) {
               }}
               aria-invalid={Boolean(touched && fieldErrors.gameLink)}
             />
-            <div className="hint">
-              Optional — we’ll pull the game name and thumbnail from this link for Play Game.
-            </div>
             {touched && fieldErrors.gameLink ? (
               <p className="field-error" role="alert">
                 {fieldErrors.gameLink}
               </p>
-            ) : null}
+            ) : (
+              <div className="hint">
+                Optional — we’ll pull the game name and thumbnail from this link for Play Game.
+              </div>
+            )}
           </div>
 
           <TagInput name="tags" />
 
           <div className={touched && fieldErrors.executors ? "field-invalid" : undefined}>
             <ExecutorPicker
+              required
               value={executors}
               onChange={(ids) => {
                 setExecutors(ids);
                 if (touched) runValidation({ executors: ids });
               }}
             />
-            <div className="field-meta">
-              {executors.length
-                ? `${executors.length} selected · ${EXECUTORS.length} available`
-                : "Select at least 1 executor"}
-            </div>
             {touched && fieldErrors.executors ? (
               <p className="field-error" role="alert">
                 {fieldErrors.executors}
@@ -252,17 +250,20 @@ export default function UploadPage({ username }: { username: string }) {
               aria-invalid={Boolean(touched && fieldErrors.description)}
               rows={4}
             />
-            <div className={`field-meta${descLen < DESC_MIN ? " is-short" : ""}`}>
-              {descLen}/{DESC_MAX} ·{" "}
-              {descLen < DESC_MIN
-                ? `${DESC_MIN - descLen} more character${DESC_MIN - descLen === 1 ? "" : "s"} needed`
-                : "minimum met"}
-            </div>
             {touched && fieldErrors.description ? (
               <p className="field-error" role="alert">
                 {fieldErrors.description}
               </p>
-            ) : null}
+            ) : (
+              <div className={`field-meta${descLen < DESC_MIN ? " is-short" : ""}`}>
+                {descLen}/{DESC_MAX} ·{" "}
+                {descLen < DESC_MIN
+                  ? `${DESC_MIN - descLen} more character${
+                      DESC_MIN - descLen === 1 ? "" : "s"
+                    } needed`
+                  : "minimum met"}
+              </div>
+            )}
           </div>
 
           <div className={touched && fieldErrors.code ? "field-invalid" : undefined}>
@@ -313,17 +314,20 @@ export default function UploadPage({ username }: { username: string }) {
               }}
               aria-invalid={Boolean(touched && fieldErrors.code)}
             />
-            <div className={`field-meta${codeLen < CODE_MIN ? " is-short" : ""}`}>
-              {lines} lines · {fmtBytes(size)} ·{" "}
-              {codeLen < CODE_MIN
-                ? `${CODE_MIN - codeLen} more character${CODE_MIN - codeLen === 1 ? "" : "s"} needed (min ${CODE_MIN})`
-                : `ready (max ${Math.floor(CODE_MAX / 1024)} KB)`}
-            </div>
             {touched && fieldErrors.code ? (
               <p className="field-error" role="alert">
                 {fieldErrors.code}
               </p>
-            ) : null}
+            ) : (
+              <div className={`field-meta${codeLen < CODE_MIN ? " is-short" : ""}`}>
+                {lines} lines · {fmtBytes(size)} ·{" "}
+                {codeLen < CODE_MIN
+                  ? `${CODE_MIN - codeLen} more character${
+                      CODE_MIN - codeLen === 1 ? "" : "s"
+                    } needed (min ${CODE_MIN})`
+                  : `ready (max ${Math.floor(CODE_MAX / 1024)} KB)`}
+              </div>
+            )}
           </div>
 
           <div className="form-actions">

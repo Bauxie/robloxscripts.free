@@ -7,12 +7,17 @@ export default function ExecutorPicker({
   name = "executors",
   value,
   onChange,
+  required = false,
 }: {
   name?: string;
   value?: string[];
   onChange?: (ids: string[]) => void;
+  required?: boolean;
 }) {
   const selected = new Set(value || []);
+  const hint = required
+    ? `Pick at least one — ${selected.size} of ${EXECUTORS.length} selected.`
+    : "Optional — help people know what to run it with.";
 
   function toggle(id: string) {
     if (!onChange) return;
@@ -26,7 +31,9 @@ export default function ExecutorPicker({
   if (!onChange) {
     return (
       <div>
-        <label>Works with executors</label>
+        <label>
+          Works with executors {required ? <span className="req">*</span> : null}
+        </label>
         <div className="executor-picker">
           {EXECUTORS.map((ex) => (
             <label key={ex.id} className="executor-chip">
@@ -37,14 +44,16 @@ export default function ExecutorPicker({
             </label>
           ))}
         </div>
-        <div className="hint">Optional — help people know what to run it with.</div>
+        <div className="hint">{hint}</div>
       </div>
     );
   }
 
   return (
     <div>
-      <label>Works with executors</label>
+      <label>
+        Works with executors {required ? <span className="req">*</span> : null}
+      </label>
       <div className="executor-picker">
         {EXECUTORS.map((ex) => (
           <label
@@ -63,7 +72,7 @@ export default function ExecutorPicker({
         ))}
       </div>
       <input type="hidden" name={name} value={(value || []).join(",")} />
-      <div className="hint">Optional — help people know what to run it with.</div>
+      <div className="hint">{hint}</div>
     </div>
   );
 }
