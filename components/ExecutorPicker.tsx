@@ -8,16 +8,26 @@ export default function ExecutorPicker({
   value,
   onChange,
   required = false,
+  error,
 }: {
   name?: string;
   value?: string[];
   onChange?: (ids: string[]) => void;
   required?: boolean;
+  error?: string;
 }) {
   const selected = new Set(value || []);
   const hint = required
     ? `Pick at least one — ${selected.size} of ${EXECUTORS.length} selected.`
     : "Optional — help people know what to run it with.";
+
+  const footer = error ? (
+    <p className="field-error" role="alert">
+      {error}
+    </p>
+  ) : (
+    <div className="hint">{hint}</div>
+  );
 
   function toggle(id: string) {
     if (!onChange) return;
@@ -44,7 +54,7 @@ export default function ExecutorPicker({
             </label>
           ))}
         </div>
-        <div className="hint">{hint}</div>
+        {footer}
       </div>
     );
   }
@@ -72,7 +82,7 @@ export default function ExecutorPicker({
         ))}
       </div>
       <input type="hidden" name={name} value={(value || []).join(",")} />
-      <div className="hint">{hint}</div>
+      {footer}
     </div>
   );
 }

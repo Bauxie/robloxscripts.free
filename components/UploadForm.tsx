@@ -214,16 +214,12 @@ export default function UploadPage({ username }: { username: string }) {
             <ExecutorPicker
               required
               value={executors}
+              error={touched ? fieldErrors.executors : undefined}
               onChange={(ids) => {
                 setExecutors(ids);
                 if (touched) runValidation({ executors: ids });
               }}
             />
-            {touched && fieldErrors.executors ? (
-              <p className="field-error" role="alert">
-                {fieldErrors.executors}
-              </p>
-            ) : null}
           </div>
 
           <label className="filter-check">
