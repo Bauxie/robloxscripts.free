@@ -56,6 +56,7 @@ export default function ScriptView({
   const [liked, setLiked] = useState(false);
   const [featured, setFeatured] = useState(s.featured);
   const [staffVerified, setStaffVerified] = useState(s.staffVerified);
+  const [compatOpen, setCompatOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -88,6 +89,7 @@ export default function ScriptView({
       await navigator.clipboard.writeText(s.code || "");
       toast("Copied to clipboard! 📋");
       fetch(`/api/scripts/${s.id}/copy`, { method: "POST" }).catch(() => {});
+      setCompatOpen(true);
     } catch {
       toast("Copy failed — select manually", true);
     }
@@ -390,6 +392,8 @@ export default function ScriptView({
           canVote={canVote}
           initialWorks={s.worksCount}
           initialBroken={s.brokenCount}
+          open={compatOpen}
+          onClose={() => setCompatOpen(false)}
         />
 
         <CommentsSection scriptId={s.id} canComment={canComment} />

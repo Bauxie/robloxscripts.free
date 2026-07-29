@@ -4,16 +4,18 @@ import { useEffect, useState } from "react";
 import { EXECUTORS } from "@/lib/executors";
 import { useToast } from "@/components/ToastProvider";
 
-export default function CompatVotes({
+function CompatVoteBody({
   scriptId,
   canVote,
   initialWorks = 0,
   initialBroken = 0,
+  onVoted,
 }: {
   scriptId: string;
   canVote: boolean;
   initialWorks?: number;
   initialBroken?: number;
+  onVoted?: () => void;
 }) {
   const toast = useToast();
   const [executorId, setExecutorId] = useState(EXECUTORS[0]?.id || "solara");
@@ -61,16 +63,12 @@ export default function CompatVotes({
       setWorks(data.works ?? works);
       setBroken(data.broken ?? broken);
       toast(v === "works" ? "Marked as working ✓" : "Marked as broken");
-      setByExecutor((prev) => {
-        const cur = { ...(prev[executorId] || { works: 0, broken: 0 }) };
-        // optimistic recount from server totals only; refresh list
-        return prev;
-      });
       const refresh = await fetch(`/api/scripts/${scriptId}/votes`);
       if (refresh.ok) {
         const d = await refresh.json();
         setByExecutor(d.byExecutor || {});
       }
+      onVoted?.();
     } catch (e) {
       toast((e as Error).message, true);
     }
@@ -79,7 +77,7 @@ export default function CompatVotes({
   const stats = byExecutor[executorId];
 
   return (
-    <div className="compat-votes panel-inset">
+    <>
       <div className="compat-head">
         <strong>Does it work?</strong>
         <span className="hint">
@@ -110,6 +108,60 @@ export default function CompatVotes({
           On this executor: {stats.works} works · {stats.broken} broken
         </p>
       ) : null}
+    </>
+  );
+}
+
+export default function CompatVotes({
+  scriptId,
+  canVote,
+  initialWorks = 0,
+  initialBroken = 0,
+  open = false,
+  onClose,
+}: {
+  scriptId: string;
+  canVote: boolean;
+  initialWorks?: number;
+  initialBroken?: number;
+  open?: boolean;
+  onClose?: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div
+      className="crop-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Does it work?"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose?.();
+      }}
+    >
+      <div className="crop-modal-panel compat-modal-panel">
+        <div className="section-head" style={{ marginTop: 0 }}>
+          <div>
+            <span className="eyebrow">Copied</span>
+            <h2>Does it work?</h2>
+            <p>After you try it, tell others if this script runs on your executor.</p>
+          </div>
+        </div>
+        <div className="compat-votes compat-votes-modal">
+          <CompatVoteBody
+            scriptId={scriptId}
+            canVote={canVote}
+            initialWorks={initialWorks}
+            initialBroken={initialBroken}
+            onVoted={onClose}
+          />
+        </div>
+        <div className="form-actions" style={{ marginTop: 16 }}>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>
+            Maybe later
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -2332,6 +2332,12 @@ pre.code .com { color: #6f8ea0; font-style: italic; } pre.code .fn { color: #ffc
   border-radius: var(--radius-sm);
   background: #fffef8;
 }
+.compat-votes-modal {
+  margin: 0;
+}
+.compat-modal-panel {
+  width: min(440px, 100%);
+}
 .compat-head {
   display: flex;
   justify-content: space-between;
